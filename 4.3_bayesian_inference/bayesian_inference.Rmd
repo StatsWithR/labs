@@ -14,24 +14,26 @@ platform.
 
 Let's load the necessary packages for this week's lab:
 
-```{r load-packages, message=FALSE}
+```{r load-packages, message=FALSE, warning=FALSE}
 library(statsr)
+library(PairedData)
 library(dplyr)
 library(ggplot2)
 ```
 
-In this week, we will use functions in the `statsr` package to conduct Bayesian inference on numerical variables. The main focus of this lab is to be able to interprete data using results obtained by Bayesian inferences. The data set and analysis functions will be provided by the `statsr` package. And we will be using `dplyr` and `ggplot2` for manipulating and visualizing the data.
-
+In this week, we will use functions in the `statsr` package to conduct Bayesian inference on numerical variables. The main focus of this lab is to be able to interprete hypothesis testing results and obtain credible intervals using Bayesian methods. We will mainly work on two data sets, one from the `PairedData` package and another one from the `statsr` package. We will be using the analysis functions provided by the `statsr` package and `dplyr` and `ggplot2` packages for manipulating and visualizing the data.
 
 ### The data
 
-In 2004, the state of North Carolina released a large data set containing 
+We will use two data sets to finish this lab. 
+
+The first data set `nc` comes from a large data set released by the State of North Carolina in 2004 that contains 
 information on births recorded in this state. These data contain information 
 on both the expectant mothers and their children. We will be working with a
 random sample of the complete data set. For those of you who took the Inferential
 Statistics course as part of the Statistics with R specialization should recognize 
-this as the same data set used in the Inference for numerical data lab where we used 
-frequentist inference methods to explore these data.
+this as the same data set used in the **Inference for Numerical Data** lab in the **Inferential Statistics** course where we used 
+frequentist inference methods to explore these data. This data set will be used in most parts of the lab.
 
 You can load the `nc` data set into our workspace using the `data` function once the `statsr` package is loaded.
 
@@ -60,9 +62,27 @@ variable         | description
 
 <br/>
 
+The second data set comes from a 2008 study *A simple tool to ameliorate detainees' mood and well-being in Prison: Physical activities*. The study was performed in a penitentiary of the Rhone-Alpes region (France), that includes two establishments, one for remand prisoners and short sentences (Jail) and the second for sentenced persons (Detention Centre, DC). A total number of 26 male subjects, imprisoned between 3 to 48 months, participated to the study. The participants were divided into two groups: 15 "Sportsmen"  who chose spontaneously to follow the physical program; and 11 "References", who did not and wished to remain sedentary. This data provide the perceived stress scale (PSS) of the participants in prison at the entry (`PSSbefore`) and at the exit (`PSSafter`). This data set will be used in the **Inference on Two Paired Means** section.
+
+You can load the `PrisonStress` data set into our workspace using the `data` function once the `PairedData` package is loaded.
+
+```{r load-data1}
+data("PrisonStress")
+```
+
+This data set consists of 26 observations on 4 variables. They are summarized as follows:
+
+variable    | description        
+------------|-----------------------------------------------------
+`Subject`   | anonymous subjects
+`Group`     | whether the subject chose to follow the physical programme `sport` or not `control`
+`PSSbefore` | perceived stress measurement at the entry
+`PSSafter`  | perceived stress measurement at the exit
+
+<br/>
 
 
-## EDA and Bayesian Inference - `weight`
+## Bayesian inference for mean with unknown variance - `weight` in `nc` data set
 
 As a first step in the analysis, we should take a look at the variables in the dataset
 and how R has encoded them. The most straight forward way of doing this is using the `str` command:
@@ -72,8 +92,7 @@ str(nc)
 ```
 
 As you review the variable summaries, consider which variables are categorical and which 
-are numerical. For numerical variables, are there outliers? If you aren't sure or want to 
-take a closer look at the data, make a graph.
+are numerical. For numerical variables, are there outliers? If you aren't sure or want to take a closer look at the data, make a graph.
 
 <div class="question">
 How many of the 13 variables are categorical?
@@ -84,19 +103,15 @@ How many of the 13 variables are categorical?
 * 8
 </div>
 
+```{r Q1-summay}
+# Type your code for Question 1 here.
+```
+
 
 We will start with analyzing the weight of the babies at birth, which are contained in the variable `weight`.
 
-<div class="exercise">
-Using visualization (e.g., a histogram) and summary statistics (e.g., using `summary` in R), describe the distribution of weight of the babies at birth.
-</div>
-
-```{r}
-# Type your code for the Exercise 2 here.
-```
-
 <div class="question">
-Which of the following best describes the distribution of `weight`?
+Use visualization such as a histogram and summary statistics tools in R to analyze the distribution of `weight`. Which of the following best describes the distribution of `weight`?
 
 * Left skewed
 * Right skewed
@@ -104,20 +119,20 @@ Which of the following best describes the distribution of `weight`?
 * Normally distributed
 </div>
 
-We will use these data to perform basic inference on $\mu$, the average weight of all babies born in North Carolina. Other than the frequentist approach, we will be doing Bayesian inference on $\mu$, which requires us to obtain the posterior distribution of $\mu$. Since it is hard to do this by hand, and the distribution may not be the traditional distribution we can use in R, we will use the `bayes_inference` function in the `statr` package to do simulation. This will allow us construct credible intervals and calculate Bayes factors for a variety of different circumstances. The following is an example how we would use the function `bayes_inference` to construct a credible interval of `weight`.
-
-In order to construct a credible interval of `weight` using `bayes_inference`, we first provide the data (set `data = nc`), and the variable of interest, (set `y = weight`), then indicate that we want a credible interval (`type="ci"`) for a mean (`statistic="mean"`).
-
-```{r}
-bayes_inference(y = weight, data = nc, statistic = "mean", type = "ci")
+```{r Q2-weight-dist}
+# Type your code for Question 2 here.
 ```
 
-In the summary message, we can see that the default the prior of $\mu$ is set to be the improper prior
-$$ \pi(\mu~|~\sigma^2) \propto 1, \qquad \pi(\sigma^2)\propto \frac{1}{\sigma^2}, \qquad \Longrightarrow \pi(\mu,\ \sigma^2)\propto \frac{1}{\sigma^2}. $$
-And the default credible level is set to be 95%. The credible level for the interval can be specified using the `cred_level = 0.95` argument.
+We will use these data to perform basic inference on $\mu$, the average weight of all babies born in North Carolina. Other than the frequentist approach, we will be doing Bayesian inference on $\mu$, which requires us to obtain the posterior distribution of $\mu$. To avoid paradoxes, we have decided to use the Cauchy prior, which is part of the Jeffrey-Zellner-Siow prior, on the mean $\mu$ conditioning on $\sigma^2$. Since there is not nice close form, we need MCMC simulation. Here we will use the `bayes_inference` function in the `statr` package to do the simulation. This will allow us construct credible intervals and calculate Bayes factors for a variety of different circumstances. The following is an example how we would use the function `bayes_inference` to construct a credible interval of `weight`.
+
+In order to construct a credible interval of `weight` using `bayes_inference`, we first provide the data (set `data = nc`), and the variable of interest, (set `y = weight`), then indicate that we want a credible interval (`type="ci"`) for a mean (`statistic="mean"`). The sample mean of `weight` is about 7.1. So we also specify the location parameter for the Cauchy distribution to be `mu_0 = 7`, the scale `rscale = 1`, and the prior as `prior = JZS`. We also specify that we are looking for the 95% credible interval by setting `cred_level = 0.95`. The code is similar to what we have seen in the Video **Mixtures of Conjugate Priors and MCMC**.
+
+```{r mean-inference, fig.align='center', out.width = "70%"}
+bayes_inference(y = weight, data = nc, statistic = "mean", type = "ci", prior = "JZS", mu_0 = 7, rscale = 1, method = "simulation", cred_level = 0.95)
+```
 
 <div class="question">
-Which of the following corresponds to the 99% credible interval for the average birth weight of all children born in North Carolina?
+Which of the following corresponds to the **99%** credible interval for the average birth weight of all children born in North Carolina?
 
 * (7.00 , 7.19)
 * (6.98 , 7.22)
@@ -125,15 +140,19 @@ Which of the following corresponds to the 99% credible interval for the average 
 * (6.94 , 7.27)
 </div>
 
+```{r Q3-mean-inference}
+# Type your code for Question 3 here.
+```
+
 We can also conduct a Bayesian hypothesis test by calculating Bayes factors. Let us test to see if the average birth weight in North Carolina is significantly different from 7 pounds. Here are the two competing hypotheses:
 
 $$ H_1: \mu = 7 $$
 $$ H_2: \mu \ne 7 $$
 
-To conduct this hypothesis test, we will use the `bayes_inference` function with specified argument `type="ht"`. We then also need to provide the `null` and `alternative` arguments to define the null value (7) and the type of alternative hypothesis (`"twosided"`), shown as follows:
+To conduct this hypothesis test, we will use the `bayes_inference` function with specified argument `type="ht"`. We then also need to provide the `null` and `alternative` arguments to define the null value (7) and the type of alternative hypothesis (`"twosided"`). By default, we will use the JZS prior with the scale of the Cauchy distribution to be 1. We suppress the credible interval plot (by setting `show_plot = FALSE`) for faster calculation. The result is shown as follows:
 
 ```{r}
-bayes_inference(y = weight, data = nc, statistic = "mean", type = "ht", null = 7, alternative = "twosided")
+bayes_inference(y = weight, data = nc, statistic = "mean", type = "ht", alternative = "twosided", null = 7, prior = "JZS", rscale = 1, method = "simulation", show_plot = FALSE)
 ```
 
 <div class="question">
@@ -145,51 +164,145 @@ Based of Jeffrey's scale for interpretation of a Bayes factors how should be des
 * Very Strong
 </div>
 
-In the graphical results above, $P(H_1 ~|~ data)$ is given by the size of the blue line, and the posterior distribution of $\mu$ under $H_2$ (scaled by $P(H_2 ~|~ data)$) is given via the black curve. The 95% credible interval for $\mu|data,H_2$ is indicated in grey.
-
-
 <div class="exercise">
 In the US, low birth is defined as being less than 2500 grams ($\approx 5.5$ lbs). Use the `bayes_inference` function to assess whether the average birth weight in North Carolina is significantly different from this value. (The answer here should be obvious, but make sure that the Bayes factor result conforms with your intuition.)
 </div>
 
-```{r}
-# Type your code for the Exercise 2 here.
+```{r E1-low-birth-ht}
+# Type your code for Exercise 1 here.
 ```
 
+## Prediction using MCMC
 
-## Inference for two means
+A key advantage of Bayesian statistics is predictions and the probabilistic interpretation of predictions.  Much of Bayesian prediction is done using simulation techniques, some of which was discussed near the end of this module. We will go over a simple simulation example to obtain the predictive distribution of the variable `weight`. 
+Instead of using the Jeffrey-Zellner-Siow prior (JZS), we then use the informative Normal-Gamma prior on the mean $\mu$ and the precision $\phi = 1/\sigma^2$.
+$$ \mu, \phi ~\sim~ \textsf{NormalGamma}(m_0, n_0, s_0^2, v_0). $$
+This is equivalent to impose priors
+$$ \mu~|~\sigma^2 ~\sim~ \textsf{N}(m_0, \sigma^2/n_0),$$
+$$ \phi = 1/\sigma^2 ~\sim~\textsf{Gamma}(v_0/2, s_0^2v_0/2). $$
 
-Next, let us consider if the mother's smoking habit has any clear effect on the child's birth weight. Here we will use the variable `habit` to distinguish between smoking and non-smoking mothers. Let us first visualized the data to get some understanding of the variable `habit`. 
+We assume the data we obtain are normally distributed
+$$ y_i~|~\mu, \sigma^2 ~\mathrel{\mathop{\sim}\limits^{\rm iid}}~ \textsf{N}(\mu, \sigma^2), \qquad i = 1, \dots, n.$$
 
-<div class="exercise">
-Construct a side-by-side boxplot of `habit` and `weight` and compare the two distributions. You may use `ggplot` with `geom_boxplot()` to help you.
-</div>
+Under the Normal-Gamma conjugate family, we can update the posterior distribution of $\mu$ and $\phi$, where
+$$ \phi = 1/\sigma^2~|~y_1,\dots, y_n ~\sim~ \textsf{Gamma}(v_n/2, s_n^2v_n/2), $$
+$$ \mu~|~\sigma^2, y_1,\dots, y_n~\sim~\textsf{N}(m_n, \sigma^2/ n_n). $$
 
-```{r normal-ci}
-# Type your code for the Exercise 3 here.
+And we should be very familiar with the updating formulas
+
+\begin{align*}
+m_n = & \frac{n_0m_0 + n\bar{Y}}{n_0+n}, \\
+n_n = & n_0 + n,\\
+v_n = & v_0 + n, \\
+s_n^2 = & \frac{1}{v_n}\left[s_0^2v_0+s^2(n-1) + \frac{n_0n}{n_n}\left(\bar{Y}-m_0\right)^2\right].
+\end{align*}
+
+We can then use this information to infer the posterior distribution of any new observation $y_{n+1}$:
+$$ y_{n+1}~|~\mu, \sigma^2~\sim~\textsf{N}(\mu, \sigma^2). $$
+
+### Prior information
+
+Suppose we expect the normal weight range to be from 5 to 9, and 95% of the observations fall within 4 standard deviations. This will give us 
+$$ m_0 = (5 + 9) / 2 = 7,\qquad \text{and}\qquad s_0^2 = ((9-5)/4)^2 = 1. $$
+
+We then adjust prior sample size $n_0$ so that the prior distribution of the observations $y_i$ will be within a reasonable range. This process is similar to the one shown in Video **Predictive Distributions and Prior Choice**. We finally choose $n_0 = 30$ and therefore, $v_0 = n_0 - 1 = 29$.
+
+### Data information
+
+Suppose we want to infer the posterior distribution of a new `weight` $y_{n+1}$. From the data, we get the sample mean $\bar{Y}$ and sample variance $s^2$ of the variable `weight`. The data sample size is 1000, obtaining by using `nrow` function.
+```{r weight-stats}
+y_bar = mean(nc$weight)          # sample mean
+s2 = sd(nc$weight) ** 2          # sample variance
+n = nrow(nc)                     # sample size
 ```
+
+### Posterior hyperparameters
+
+Using the updating formulas, we can calculate $m_n, n_n, v_n, s_n^2$ as follows:
+```{r update-hyper}
+m_0 = 7; n_0 = 30; v_0 = n_0 - 1; s2_0 = 1
+m_n = (n_0 * m_0 + n * y_bar) / (n_0 + n)
+n_n = n + n_0
+v_n = n + v_0
+s2_n = 1/v_n * (s2_0 * v_0 + 
+                         s2 * (n - 1) + (n * n_0) / n_n * ((y_bar - m_0)^2))
+print(m_n)
+print(n_n)
+print(v_n)
+print(s2_n)
+```
+
+### Posterior predictive distribution of new observation $y_{n+1}$
+
+To obtain the predictive distribution for any new observation $y_{1001}$, we can first simulate $\sigma^2$ from its posterior and then $\mu$ followed by $y_{1001}$.  Our draws of $y_{1001}$ will be from the posterior predictive distribution for a new observation.  The example below draws $N=1,000,000$ times from the posterior predictive distribution of $y_{1001}$.
+
+```{r postpred}
+set.seed(314)
+N = 1000000                            # 1,000,000 times simulation
+phi = rgamma(N, v_n/2, s2_n * v_n / 2) # Gamma(v_n/2, s_n^2 * v_n / 2)
+sigma2 = 1/phi
+mu = rnorm(N, m_n, sqrt(sigma2/n_n))   # N(m_n, sigma^2 / sqrt(n_n))
+y_1001 = rnorm(N, mu, sqrt(sigma2))    # N(mu, sigma^2)
+```
+
+We can view an estimate of the predictive distribution, by looking at the a smoothed version of the histogram of the simulated data:
+
+```{r preddens, fig.align="center", out.width="70%"}
+sim_data = data.frame(new_obs = y_1001)
+ggplot(data = sim_data, aes(x = new_obs)) + 
+  geom_histogram(aes(y = ..density..), bins = 3000) +
+  xlab(expression(y[1001]))
+```
+
+A 95% central credible interval for a new observation is the interval (L, U) where  $P(Y_{1001} < L \mid  Y) = 0.05/2$ and $P(Y_{1001} > U \mid Y) = 0.05/2)$.  In this case, since the posterior distribution of $y_{1001}$ is normal, which is symmetric, we can set L to be the 0.025 quantile and U to be the 0.975 quantile.
 
 <div class="question">
-Which of the following is *false* about the relationship between `habit` and `weight`?
+Estimate a 95\% central credible interval for a new observation $y_{1001}$
 
-* Median birth weight of babies born to non-smoker mothers is slightly higher than that of babies born to smoker mothers.
-* Range of birth weights of babies born to non-smoker mothers is greater than that of babies born to smoker mothers.
+* (4.164, 10.027)
+* (4.955, 9.077)
+* (5, 9)
+* (6.380, 8.060)
+</div>
+
+```{r Q5-cred-int}
+# Type your code for Question 5 here.
+```
+
+<div class="exercise">
+In the simple example above, it is possible to use integration to calculate the posterior predictive distribution of $y_{1001}$ analytically. In this case, $y_{1001}$ follows a non-standardized Student's $t$-distribution with degrees of freedom equal to $v_n$, location parameter $m_n$, and scale parameter $\sqrt{s_n^2(1 + 1/n_n)}$. Plot the empirical density of $y_{1001}$ alongside the actual density of the t-distribution. How do they compare?
+</div>
+
+```{r E2-t-dist}
+# Type your code for Exersice 2 here.
+```
+
+
+## Bayesian inference for two independent means
+
+Next, let us consider whether there is a difference of baby weights between two genders. Here we will use the variable `gender` to distinguish between female babies and male babies. Let us first visualized the data to get some understanding of the variable `gender`. 
+
+<div class="question">
+Construct a side-by-side boxplot of `gender` and `weight` and compare the two distributions. Which of the following is *false* about the relationship between `gender` and `weight`?
+
+* Median birth weight of male babies is slightly higher than that of female babies.
+* Range of birth weights of female babies are roughly the same as that of male babies.
 * Both distributions are extremely right skewed.
 * The IQRs of the distributions are roughly equal.
 </div>
 
-```{r habit-weight-box}
-# type your code for the Question 5 here.
+```{r Q6-gender-weight-box}
+# Type your code for Question 6 here.
 ```
 
-As before, we use the `bayes_inference` function to either construct a credible interval and or calculate the Bayes factor. The calls will be identical to the single mean case, except now we will provide `habit` as a predictor variable (argument `x = habit`). For credible interval:
+As before, we can use the `bayes_inference` function to construct the credible interval for the mean of the difference in weights of the two genders. The calls is almost identical to the single mean case, except now we will provide `gender` as a explanatory variable (argument `x = gender`). Here, we use the theoretical method instead of simulation (argument `method = "theoretical"`).
 
-```{r}
-bayes_inference(y = weight, x = habit, data = nc, statistic = "mean", type = "ci")
+```{r ci-gender-weight, warning = F, fig.align = "center", out.width = "70%"}
+bayes_inference(y = weight, x = gender, data = nc, statistic = "mean", type = "ci", mu_0 = 0, cred_level = 0.95, prior = "JZS", rscale = 1, method = "theoretical")
 ```
 
 <div class="question">
-Based on the credible interval is there evidence that smoking reduces birth weight? 
+Based on the credible interval, is there evidence that male babies are in general heavier than female babies? 
 
 * Yes
 * No
@@ -197,8 +310,8 @@ Based on the credible interval is there evidence that smoking reduces birth weig
 
 For hypothesis test, note that we also change the null value into `null = 0`, since we are interested in comparing if the means of the two groups are equal or not.
 
-```{r}
-bayes_inference(y = weight, x = habit, data = nc, statistic = "mean", type = "ht", null = 0, alternative = "twosided")
+```{r ht-gender-weight}
+bayes_inference(y = weight, x = gender, data = nc, statistic = "mean", type = "ht", alternative = "twosided", null = 0, prior = "JZS", rscale = 1, method = "theoretical", show_plot = FALSE)
 ```
 
 <div class="question">
@@ -210,26 +323,21 @@ Based on the Bayes factor calculated above, how strong is evidence against $H_1$
 * Very Strong
 </div>
 
-
-## Inference for proportions
-
-Finally, we can also conduct Bayesian inference when our outcome variable of interest is categorical. Similar to the frequentist inference function we used in the previous courses in this specializatoin, the only change is to specify a $y$ argument that is categorical (with only two levels) and then specify which of its levels is the "success" using the `success` argument. Finally, we change the `statistic` of interest to `"proportion"`.
-
-For example if we want to test if only 7.5% of births in North Carolina are considered low birth weight (variable `lowbirthweight`) we can calculate the Bayes factor using the following code:
-```{r}
-bayes_inference(y = lowbirthweight, data = nc, success = "low", statistic = "proportion", type = "ht", null = 0.075, alternative = "twosided")
-```
-
 <div class="question">
-How would the Bayes factor above change if we were to increase the prior probability of $H_2$?
+How would the Bayes factor above change if we were to increase the prior probability of $H_2$? (Hint: you may change the prior of $H_1$ and $H_2$ by specifying `hypothesis_prior = c(a, b)` where $P(H_1) = a$, $P(H_2) = b$, and $a+b = 1$.)
 
 * Get bigger
 * Get smaller
 * Stay the same
 </div>
 
+```{r Q9-ht-gender-weight-increase-H2}
+# Type your code for Question 9 here.
+```
+
+
 <div class="question">
-How would the Bayes factor above change if we were to change the prior of p to be $Beta(75,925)$?
+How would the Bayes factor above change if we were to change the scale $r$ in the Cauchy prior to be $\textsf{C}(0, r^2 = 2^2)$?
 
 * Get bigger
 * Get smaller
@@ -237,76 +345,80 @@ How would the Bayes factor above change if we were to change the prior of p to b
 </div>
 
 
-Using what you have learned so far, conduct a Bayesian inference procedure to evaluate whether these data provide evidence for or against smoking being associated with low birth weight and smoking being associated with premature birth (variable `premie`).
-
-<div class="question">
-These data provide ___________ evidence ___________ smoking affecting the chance of low birth weight.
-
-* weak; for
-* strong; for
-* weak; against
-* strong; against
-</div>
-
-
-<div class="question">
-These data provide ___________ evidence ___________ smoking affecting the chance of premature birth.
-
-* weak; for
-* strong; for
-* weak; against
-* strong; against
-</div>
-
-## Prediction
-
-A key advantage of Bayesian statistics is prediction and the probabilistic interpretation of predictions.  Much of Bayesian prediction is done using simulation techniques, some of which was discussed near the end of this module. We will go over a simple simulation example.
-
-Suppose you observe four numerical observations of $y$, which are 2, 2, 0 and 0 respectively with sample mean $\bar{y} = 1$ and sample variance $s^2 = 4/3$.  Assuming that $y \sim N(\mu, \sigma^2)$, under the reference prior $p(\mu,\sigma^2) \propto 1/\sigma^2$, our posterior becomes
-
-
-$$\mu|\sigma^2, y \sim N(1, \sigma^2/4)$$
-which is centered at the sample mean and 
-$$1/\sigma^2, y \sim Gamma(\alpha = 3/2,\beta = 4/2)$$
-where $\alpha = (n - 1)/2$ and $\beta = s^2 (n-1)/2 = 2$.
-
-To obtain the predictive distribution for $y_5$, we can first simulate $\sigma^2$ from its posterior and then $\mu$ followed by $y_5$.  Our draws of $y_5$ will be from the posterior predictive distribution for a new observation.  The example below draws 100,000 times from the posterior predictive distribution of $y_5$.
-
-```{r postpred}
-set.seed(314)
-N = 100000
-phi = rgamma(N,3/2,2)
-sigma2 = 1/phi
-mu = rnorm(N, 1, sqrt(sigma2/4))
-y_5 = rnorm(N, mu, sqrt(sigma2))
+```{r Q10-ht-gender-weight-increase-rscale}
+# Type your code for Question 10 here.
 ```
 
-We can view an estimate of the predictive distribution, by looking at the a smoothed version of the histogram of the simulated data:
 
-```{r preddens}
-hist(y_5, prob=T, breaks=30, xlab=expression(y[5]), main="")
+## Bayesian inference on Two Paired Means
+
+Now we turn to the `PrisonStress` data set. We have two groups of observations: the `sport` group, the ones who chose to follow the physical training program; and the `control` group, the ones who chose not to follow. We are interested to know whether in average there is any difference in the perceived stress scale (PSS) before they started the training (at the entry) and after the training (at the exit).
+
+We first analyze the `control` group data. We subset the data according to the `Group` variable using the `dplyr` package, and save this into a smaller data set `PPS.control`.
+
+```{r select-control}
+PSS.control = PrisonStress %>%
+  filter(Group == "Control")
 ```
 
-A 95% central credible interval for a new observation is the interval (L, U) where  $P(Y_5 < L \mid  Y) = .05/2$ and $P(Y_5 > U \mid Y) = .05/2)$.  In this case, since the posterior distribution of $y_5$ is normal, which is symmetric. We can set L to be the 0.025 quantile and U to be the 0.975 quantile.  We can obtain those values using the `quantile` function to find the sample quantiles for 0.025 and 0.975 of $y_5$.
+We then calculate the difference of the PSS of each subject before and after the training.
 
-<div class="question">
-Estimate a 95\% central credible interval for a new observation $y_5$
+```{r control-diff}
+PSS.control$diff = PSS.control$PSSbefore - PSS.control$PSSafter
+```
 
-* (-3.71, 5.73)
-* (-3.11, 5.13)
-* (-1.18, 3.19)
-</div>
+We can now conduct the following hypothesis test:
+$$  H_1: \mu_{\text{before}} = \mu_{\text{after}}\qquad \Longrightarrow \qquad H_1: \mu_{\text{diff}} = 0, $$
 
-```{r}
-# Type your code for Question 12 here.
+$$  H_2: \mu_{\text{before}} \neq \mu_{\text{after}}\qquad \Longrightarrow \qquad H_1: \mu_{\text{diff}} \neq 0, $$
+
+We use `bayes_inference` function to calculate the Bayes factor. The code is similar to the one we used for inference for one mean, except that we need to set `null=0`, because we are comparing the mean of the difference to 0.
+
+```{r ht-control-diff}
+bayes_inference(y = diff, data = PSS.control, statistic = "mean", type = "ht", alternative = "twosided", null = 0, prior = "JZS", rscale = 1, method = "simulation", show_plot = FALSE)
 ```
 
 
 <div class="exercise">
-In the simple example above, it is possible to use integration to calculate the posterior predictive analytically.  In this case, it is a scaled $t$ distribution with degree of freedom equal to $(n - 1) = 3$, mean equal to $1$, and scale $s^2(1 + 1/n) = 5/3$.  Plot the empirical density of $y$ alongside the actual density of the t-distribution.  How do they compare?
+Modify the code above, to calculate the 95% credible interval of the mean of the difference of the perceived stress scale for the subjects who did not follow the physical training program. Is there a significant evidence that their perceived stress level increased or decreased through imprisonment?
 </div>
 
-```{r tplot}
-# Type your code for the Exercise 4 here.
+```{r E3-ci-control-diff}
+# Type your code for Exercise 3 here.
 ```
+
+<div class="question">
+Conduct the same hypothesis test for the mean of difference in perceived stress scale for the `sport` group. Based of Jeffrey's scale for interpretation of a Bayes factors how should be describe the evidence against $H_1$ from the results?
+
+* Not worth a bare mention
+* Positive
+* Strong
+* Very strong
+</div>
+
+```{r Q11-ht-sport-diff}
+# Type your code for Question 11 here.
+```
+
+## Bayesian inference for proportions (optional)
+
+Finally, we can also conduct Bayesian inference when our outcome variable of interest is categorical and we are interested in the inference for the proportion. The only change in the code of the `bayes_inference` function is to specify a $y$ argument that is categorical (with only two levels) and then specify which of its levels is the "success" using the `success` argument. Finally, we change the `statistic` of interest to `"proportion"`.
+
+For example if we want to test if only 7.5% of births in North Carolina are considered low birth weight (variable `lowbirthweight`) we can calculate the Bayes factor using the following code:
+```{r}
+bayes_inference(y = lowbirthweight, data = nc, success = "low", statistic = "proportion", type = "ht", null = 0.075, alternative = "twosided", method = "theoretical", beta_prior = c(1, 1), show_plot = FALSE)
+```
+
+In the code above, we specify the prior for the proportion to be the Beta prior $\textsf{Beta}(1, 1)$. 
+
+<div class="exercise">
+Using what you have learned so far, conduct a Bayesian inference procedure to evaluate whether these data provide evidence for or against smoking being associated with premature birth (variable `premie`).
+</div>
+
+```{r E4}
+# Type your code for Exercise 4 here.
+```
+
+
+
 
