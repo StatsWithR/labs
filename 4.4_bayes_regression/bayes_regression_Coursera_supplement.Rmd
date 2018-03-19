@@ -1,0 +1,126 @@
+---
+title: "Bayesian Linear Regression"
+output: statsr:::statswithr_lab
+---
+
+## Optional Advanced Topic: Best Out of Sample Prediction
+
+First we will reload the statsr and BAS packages along with the wage data.
+
+```{r load-packages, message=FALSE}
+library(statsr)
+library(BAS)
+data(wage)
+```
+
+One approach to help select among alternate estimators is to use out of sample of sample validation to compare predictive accuracy.   The following code creates a training data and test data set based on a left out 10% sample.  We obtain the posterior distribution of models and model specific parameters using `BAS` using only the training data.  Using this posterior distribution we then predict `lwage`  using the explanatory variables in the test data set for several estimators: `BMA`, `BPM`, `MPM` and `HPM` and extract the predicted (`fit`) values.  The function `cv.summary.bas` computes the average square root mean squared error between the fitted values and the observed values of `lwage` in the left our test data.  We repeat this in a loop This may take *some time* to run.    
+```{r cv, cache=TRUE}
+set.seed(42)
+
+wage_no_na = na.omit(wage)
+
+n = nrow(wage_no_na)
+n_cv = 50
+ape = matrix(NA, ncol=4, nrow=n_cv)
+colnames(ape) = c("BMA", "BPM", "HPM", "MPM")
+
+for (i in 1:n_cv) {
+  train = sample(1:n, size=round(.90*n), replace=FALSE)
+  lwage_train = wage_no_na[train,]
+  lwage_test = wage_no_na[-train,]
+
+  bma_train_wage = bas.lm(lwage ~ . - wage, data=lwage_train, 
+                          prior="BIC", modelprior=uniform(), initprobs="eplogp")
+  yhat_bma = predict(bma_train_wage, lwage_test, estimator="BMA")$fit
+  yhat_hpm = predict(bma_train_wage, lwage_test, estimator="HPM")$fit
+  yhat_mpm = predict(bma_train_wage, lwage_test, estimator="MPM")$fit
+  yhat_bpm = predict(bma_train_wage, lwage_test, estimator="BPM")$fit
+  ape[i, "BMA"] = cv.summary.bas(yhat_bma, lwage_test$lwage)
+  ape[i, "BPM"] = cv.summary.bas(yhat_bpm, lwage_test$lwage)
+  ape[i, "HPM"] = cv.summary.bas(yhat_hpm, lwage_test$lwage)
+  ape[i, "MPM"] = cv.summary.bas(yhat_mpm, lwage_test$lwage)
+}
+```
+
+We can look at how sensitive the predictions are to the choice of estimator by viewing the side-by-side boxplots of the average prediction errors as well as the mean of the APE over the different test sets. 
+```{r ape}
+boxplot(ape)
+apply(ape, 2, mean)
+```
+
+While `BMA` is the best,  followed by `BPM`, they are all pretty close in this case.   Note the values of the average prediction error are on the same scale as the `lwage` or the residual MSE from `lm` where the smaller the better.
+
+This can be used to compare different prior distributions (say `BIC` versus `ZS-null`) or other options.
+
+<div id="exercise">
+**Exercise:**   Using the reduced data set, compare the average prediction error using the four different estimators with `BIC`.  What happens if you switch to using `prior="ZS-null"' with `bas.lm`
+</div>
+
+
+## Experimental:  Outlier Detection
+
+Looking at the residual plot of observed and fitted values under BMA using the original model fit, 
+
+```{r residuals}
+bma_lwage = bas.lm(lwage ~ . -wage, data = wage_no_na,
+                   prior = "BIC", 
+                   modelprior = uniform())
+plot(bma_lwage, which=1)
+```
+
+
+it appears that there may be some outliers in the data -  observations `379`, `440` and `560` have  been flagged as the points with the three largest absolute residuals.  Are they outliers or points who have a different mean or distribution than the others?
+
+We can add an indicator variable for each observation to the design matrix where if the indicator variable is included this corresponds to the case having a different mean than what is expected under the regression model.  If all indicators are included, then that corresponds to each case having a different mean, which is not very useful, so some form of outliers selection or model averaging is needed in combination with posterior inference about the other variables.
+
+```{r  outliers, cache=T}
+set.seed(42)
+n = nrow(wage_no_na)
+wage_outliers = cbind(wage_no_na, diag(1, nrow=n))
+outliers_lwage = bas.lm(lwage ~ . -wage, data=wage_outliers, 
+                        prior="ZS-null", a=n,
+                        modelprior=tr.beta.binomial(a=1, b=1, trunc=n/2),
+                        method="MCMC",
+                        initprobs="marg-eplogp",
+                        MCMC.iterations=500000, n.models=2^15
+                        )
+
+```
+
+This uses the `method="MCMC"` as enumeration is not feasible.  We are also introducing a truncated beta-binomial distribution on the model size.  This assigns all models with more than `n/2` coefficients a zero probability a priori which limits the number of possible outliers.  (This could be smaller, say even 16, to prevent models with too many outliers and predictors).  The `initprobs` argument used here helps to sort variables and makes the algorithm more efficient with the MCMC option.
+
+Looking at the diagnostic plot for `MCMC`
+```{r diag}
+diagnostics(outliers_lwage, type="pip")
+```
+
+it appears that we did not use enough MCMC iterations for convergence to the marginal inclusion probabilities.  Let's rerun again and also lower the truncation point.
+
+```{r rerun, cache=TRUE}
+outliers_lwage = bas.lm(lwage ~ . -wage, data=wage_outliers, 
+                        prior="ZS-null", a=n,
+                        modelprior=tr.beta.binomial(a=1, b=1, trunc=16),
+                        method="MCMC",
+                        initprobs="marg-eplogp",
+                        MCMC.iterations=2*10^6
+                        )
+
+diagnostics(outliers_lwage, type="pip")
+```
+
+
+
+The diagnostic plot looks better, with the larger inclusion probabilities in reasonable agreement, however, several below 0.3 could benefit from running longer. This is probably adequate for the outlier detection and implementing model averaging, however, as predicted values tend to converge faster than probabilities.
+
+<div id="exercise">
+**Exercise:**  Fit the outlier model with the reduced dataset. Create a diagnostic plot with the output and determine how many MCMC iterations are needed.  
+</div>
+
+The summary function is not as useful with so many possible predictors.  Instead, let's look at which variables have high marginal inclusion probabilities:
+
+```{r outlier-id}
+outliers_lwage$namesx[outliers_lwage$probne0 > .5]
+
+```
+
+This suggests that cases `379`, `440` and `560` are potential outliers (this list may vary depending on Monte Carlo variation).  A good data sleuth will investigate these cases and determine if there are valid reasons for why they may appear to be from a different population as justification for removing them. The model averaging paradigm will let us perform an analysis that accounts for the uncertainty that they have different means than what any of the regression models would specify.
