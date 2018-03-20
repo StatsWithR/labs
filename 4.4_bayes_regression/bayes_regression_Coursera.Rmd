@@ -328,6 +328,9 @@ so the fact that we did discover some outliers is not that surprising.
 
 So instead of fixing the number of standard deviations to $k=3$, an alternative is fix the prior probability of there being no outliers in the sample, 
 $$P(\text{no outliers in sample}) = P(\text{observation is not an outlier})^n = 0.95$$
+which we can solve for
+$$ P(\text{observation is not an outlier}) = 0.95^{1/n}
+$$
 and then solve for  $k$ using the normal quantile function.
 ```{r}
 n = nrow(wage)
@@ -335,6 +338,11 @@ prob.obs.not.outlier = .95^(1/n)
 newk = qnorm(.5 + .5*prob.obs.not.outlier)
 ```
 
+The function `Bayes.outlier` can also calculate `k` internally if we specify the prior probability of there being no outliers in the sample:
+
+```{r no-outliers-in-sample}
+outliers = Bayes.outlier(m_lwage_iq, prior.prob=0.95)
+```
 
 
 
