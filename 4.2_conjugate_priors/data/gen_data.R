@@ -1,3 +1,5 @@
+# Code used to generate the brfss data frame in the statsr package
+
 library(dplyr)
 
 if(!file.exists("brfss2013.RData"))
@@ -35,6 +37,4 @@ brfss_female = brfss %>% filter(sex == "Female") %>% sample_n(n_female)
 
 brfss = rbind(brfss_male, brfss_female) %>% sample_n(n)
 
-
 save(brfss, file="brfss.rda")
-        
