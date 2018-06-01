@@ -147,7 +147,7 @@ summary(nc.fullterm)
 ```
 
 The `filter` function selects variables all variables from the dataframe `nc` 
-the condition `premie` equals "full term" is met.
+where the condition `premie` equals "full term" is met.
 
 <div class="exercise">
 Repeat the visualization and summary with the weights from full term term 
@@ -156,10 +156,10 @@ births. Does `weight` appear to be approximately normally distributed?
 
 ## Inference
 
-Next we will introduce a function `bayes_inferernce` that we will use for 
-constructing confidence intervals and conducting hypothesis tests. The following 
+Next we will introduce a function `bayes_inference` that we will use for 
+constructing credible intervals and conducting hypothesis tests. The following 
 illustrates how we would use the function `bayes_inference` to construct a 95% 
-credible interval of `weight`, the Bayesian analogue to a 95% confidence 
+credible interval of `weight`; the Bayesian analogue to a 95% confidence 
 interval.
 
 
@@ -192,13 +192,12 @@ the prior on standardized effect $\mu/\sigma$ is a Cauchy centered at `mu_0`
 and with a scale of `rscale`. By default these are zero and one respectively. 
 The average birthweight for full term births in the US in 1994-1996 was 7.7 
 pounds, which we will use as the center of our prior distribution using the 
-argument `mu_0 = 7.7`. We will use the default argument `rscale = 1`. We 
-alsospecify that we are looking for the 95% credible interval by setting 
-`cred_level = 0.95`. The method of inference can be either 
+argument `mu_0 = 7.7`. We will use the default argument `rscale = 1`. The method of inference can be either 
 `method = "theoretical"` (theoretical based) or `"simulation"` based; in the 
 case of the `JZS` prior for credible intervals, `"simulation"` is the only 
-option as there are no closed form results. Finally, the argument `cred_level` 
-specifies the probability for the credible interval, with a default of 0.95. 
+option as there are no closed form results.  We 
+also specify that we are looking for the 95% credible interval by setting 
+`cred_level = 0.95`, which is the default. 
 For more information on the `bayes_inference` function see the help file with 
 `?bayes_inference`.
 
@@ -220,7 +219,7 @@ Carolina for full term births is significantly different from the US average of
 $$ H_1: \mu = 7.7 $$
 $$ H_2: \mu \ne 7.7 $$
 
-To conduct this hypothesis test, we will need to change the `type` arguement to 
+To conduct this hypothesis test, we will need to change the `type` argument to 
 hypothesis test, `type="ht"` in the `bayes_inference` function. In addition, we 
 will need to add the type of alternative hypothesis as an additional argument 
 `alternative = "twosided"`. For faster calculation, change the method to 
@@ -258,16 +257,14 @@ weight.post = bayes_inference(y = weight, data = nc.fullterm,
                               cred_level = 0.95)
 ```
 
-The `names` function can list the output that is stored in the object:
+The `names` function can list the output or objects that are stored in the object created by `bayes_inference`:
 
 ```{r}
 names(weight.post)
-summary(weight.post$samples)
 ```
 
-In particular, `samples` is a matrix which contain the draws from the MCMC 
-simulation, where the columns `mu` and the column `sig2` are posterior samples 
-of the mean and variance respectively.
+In particular, the `samples` object is a `matrix` or table which contain the draws from the MCMC 
+simulation, and includes columns for `mu` and  `sig2`, which are posterior samples of the mean and variance respectively.  Let's see how we can use these to make predictions.
 
 ### Posterior predictive distribution of new observation $y_{n+1}$
 
@@ -278,6 +275,8 @@ While we do not know $\mu$ and $\sigma^2$ we the draws of $\mu$ and $\sigma^2$
 from their posterior distributions. If we substitute these values into the 
 normal distribution for $Y_{n+1}$, we can obtain samples from the predictive 
 distribution for the birth weight for any new observation $y_{1001}$. 
+
+We'll first convert our `samples` into a dataframe and then use `mutate` the create draws from the predictive distribution using `rnorm`:
 
 ```{r pred-distribution}
 samples = as.data.frame(weight.post$samples)
@@ -303,9 +302,10 @@ Using the `quantile` function `R` we can find the 0.025 and 0.975, as well as
 median (0.50) quantiles of the predictive distribution:
 
 ```{r}
-quantile(samples[["mu"]], c(0.025, 0.5, 0.975)) 
-quantile(samples[["y.pred"]], c(0.025, 0.5, 0.975))
+dplyr::select(samples, mu, y.pred) %>%
+  map(quantile, probs=c(0.025, 0.50, 0.975))
 ```
+In the above code we are using `dplyr:select` to select just the columns `mu` and `y.pred` from `samples`.  The usage of `dplyr:` precending `select`, ensures that we are using the `select` function from the `dplyr` package to avoid possible name conflicts, as several packages have a `select` function.  We are also taking advantage of the pipe operator to send the selected columns to the `map` function to apply the `quantile` function to each of the selected columns for the probabilities in the argument `probs` to `quantile`.
 
 <div class="question">
 For predicting the birth weight of a new full term baby in NC, 
@@ -430,7 +430,7 @@ in the Cauchy prior `rscale = sqrt(2)/2`?
 </div>
 
 ```{r Q10-ht-gender-weight-increase-rscale}
-# Type your code for the Question here.
+# Type your code for  Question 9 here.
 ```
 
 
@@ -455,7 +455,7 @@ weights for nonsmokers and smoker:
 </div>
 
 ```{r Q9-ci-weight-habit-increase}
-# Type your code for Question 9 here.
+# Type your code for Question 10 here.
 ```
 
 ## Bayesian inference on Two Paired Means
@@ -565,7 +565,5 @@ that the means are not equal.
 # Type your code for Exercise 2 here.
 ```
 
-<div id="license">
-This is a derivative of an [OpenIntro](https://www.openintro.org/stat/labs.php) lab, and is released under a [Attribution-NonCommercial-ShareAlike 3.0 United States](https://creativecommons.org/licenses/by-nc-sa/3.0/us/) license.
-</div>
+
 
