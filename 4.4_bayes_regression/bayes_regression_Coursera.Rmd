@@ -37,36 +37,57 @@ references:
   type: book
 ---
 
+```{r setup, include=FALSE}
+options(digits = 4)
+```
+
+
 <div class="instructions">
-Complete all **Exercises**, and submit answers to **Questions** on the Coursera 
-platform.
+Complete all **Exercises**, and submit answers to **Questions** in the **Quiz: Week 4 of Lab** on Coursera.
 </div>
 
 ## Modeling Wages 
 
-In the field of labor economics, the study of income and wages provides insight about topics ranging from gender discrimination to the benefits of higher education.  In this lab, we will analyze cross-sectional wage data in order to practice using Bayesian selection methods such as BIC and Bayesian Model Averaging to construct parsimonious predictive models.
+In the field of labor economics, the study of income and wages provides insight 
+about topics ranging from gender discrimination to the benefits of higher 
+education. In this lab, we will analyze cross-sectional wage data in order to 
+practice using Bayesian selection methods such as BIC and Bayesian Model 
+Averaging to construct parsimonious predictive models.
 
 ## Getting Started
 
-
-
-In this lab we will explore the data using the `dplyr` package and visualize it using the `ggplot2` package for data visualization. We will review simple linear regression using the `lm` function and how the output can be interpreted from a Bayesian perspective. We will use the `stepAIC` function from the `MASS` package for model selection using step-wise selection using BIC.  The `bas.lm` function from the `BAS` package later in the lab to implement Bayesian Model Averaging.  Please make sure that the version of `BAS` is 1.4.9 or greater.  The data can be found in the companion package for this course, `statsr`.  Some learners may want to review material from the earlier courses in the specialization that covers EDA and regression if they are unfamiliar with `ggplot` basics or the `lm` function.
+In this lab we will explore the data using the `dplyr` package and visualize it 
+using the `ggplot2` package for data visualization. Both of these packages are 
+part of the tidyverse. We will review simple linear regression using the `lm` 
+function and how the output can be interpreted from a Bayesian perspective. We 
+will also use the `broom` package to turn regression outputs to tidy data frames 
+to help with diagnostic plotting. We will use the `stepAIC` function from the 
+`MASS` package for model selection using step-wise selection using BIC. The 
+`bas.lm` function from the `BAS` package later in the lab to implement Bayesian 
+Model Averaging. Please make sure that the version of `BAS` is 1.4.9 or greater. 
+The data can be found in the companion package for this course, `statsr`. Some 
+learners may want to review material from the earlier courses in the 
+specialization that covers EDA and regression if they are unfamiliar with 
+`ggplot` basics or the `lm` function.
 
 ### Load packages
-Let us load the packages that we will be using:
+
+Let's load the packages that we will be using:
 
 ```{r load-packages, message=FALSE, warning = F}
 library(MASS)
-library(dplyr)
-library(ggplot2)
+library(tidyverse)
 library(statsr)
 library(BAS)
+library(broom)
 ```
-
 
 ### The data
 
-The data we will be using in this lab were gathered as a random sample of 935 respondents throughout the United States. This data set was released as part of the series *Instructional Stata Datasets for Econometrics* by the Boston College Department of Economics [@Wooldridge2000].
+The data we will be using in this lab were gathered as a random sample of 935 
+respondents throughout the United States. This data set was released as part of 
+the series *Instructional Stata Datasets for Econometrics* by the Boston College 
+Department of Economics [@Wooldridge2000].
 
 Let's start by loading the data:
 
@@ -96,30 +117,53 @@ variable         | description
 
 
 <div class="question">
-Is this an observational study or an experiment? You may refer to http://study.com/academy/lesson/experiments-vs-observational-studies.html for the definitions of the two.
+Is this an observational study or an experiment? You may refer to 
+http://study.com/academy/lesson/experiments-vs-observational-studies.html for 
+the definitions of the two.
 
 * Observational study
 * Experiment
 </div>
 
+### Setting a seed
+
+In this lab we will do some random generation, which means you should set a seed 
+on top of your document. Setting a seed will cause R to sample the same sample 
+each time you knit your document. This will make sure your results don't change 
+each time you knit, and it will also ensure reproducibility of your work 
+(by setting the same seed it will be possible to reproduce your results). 
+You can set a seed like this:
+
+```{r set-seed}
+set.seed(18382)
+```
+
+The number above is completely arbitraty. If you need inspiration, you can use 
+your ID, birthday, or just a random string of numbers. The important thing is 
+that you use each seed only once. You only need to do this once in your 
+R Markdown document, but make sure it comes before sampling.
+
 ## Exploring the data
 
-For a new data set, a good place to start is standard exploratory data analysis. We will begin with the `wage` variable since it will be the response variable in our models. We may use a histogram  to visualize the distribution.
+For a new data set, a good place to start is standard exploratory data analysis. 
+We will begin with the `wage` variable since it will be the response variable in 
+our models. We may use a histogram  to visualize the distribution.
 
 ```{r Q1-wage-hist}
 ggplot(data = wage, aes(x = wage)) +
   geom_histogram(binwidth = 100)
 ```
 
-
-For numeric summary statistics, the `summary` function provides additional insights about the distribution of `wage`.
+For numeric summary statistics, the `summary` function provides additional 
+insights about the distribution of `wage`.
 
 ```{r Q1-wage-dist}
 summary(wage$wage)
 ```
 
 <div class="question">
-Which of the following statements is **false** about the distribution of weekly wages? 
+Which of the following statements is **false** about the distribution of 
+weekly wages? 
 
 * The median of the distribution is 905.
 * 25\% of respondents make at least 1160 dollars per week.
@@ -127,41 +171,44 @@ Which of the following statements is **false** about the distribution of weekly 
 * `wage` is right-skewed, meaning that more respondents have weekly wages below the mean weekly wage than above it.
 </div>
 
-
-
-
 ## Simple linear regression
 
-Since `wage` is our response variable, we would like to explore the relationship between `wage` and other variables as predictors. One possible, simplistic, explanation for the variation in wages that we see in the data is that smarter people make more money. The plot below visualizes a scatterplot between weekly wage and IQ score.
+Since `wage` is our response variable, we would like to explore the relationship 
+between `wage` and other variables as predictors. One possible, simplistic, 
+explanation for the variation in wages that we see in the data is that smarter 
+people make more money. The plot below visualizes a scatterplot between weekly 
+wage and IQ score.
 
 ```{r scatter-score-bty_avg}
 ggplot(data = wage, aes(x = iq, y = wage)) +
   geom_point()
 ```
 
-There appears to be a positive relationship between IQ score and wage.  We can quantify this by fitting a Bayesian simple linear regression 
+There appears to be a positive relationship between IQ score and wage. We can 
+quantify this by fitting a Bayesian simple linear regression 
 
-$$\text{wage}_i = \alpha + \beta \cdot \text{iq}_i + \epsilon_i$$
-to the observed data using the reference prior. We can fit the model using the `lm` function: 
+$$\text{wage}_i = \alpha + \beta \cdot \text{iq}_i + \epsilon_i$$ 
+to the observed data using the reference prior. We can fit the model using the 
+`lm` function: 
 
 ```{r wage-iq-model}
-m_wage_iq = lm(wage ~ iq, data = wage)
+m_wage_iq <- lm(wage ~ iq, data = wage)
 ```
 
-and extract the summary statistics for the posterior distribution using the output from the `summary` from `lm`.
+and extract the summary statistics for the posterior distribution using the 
+output from the `lm` by applyting the `tidy` function from the `broom` package.
 
-```{r wage-iq-summary}
-summary(m_wage_iq)  
+```{r}
+tidy(m_wage_iq)
 ```
 
-In particular, we are interested in the coefficients table; its first column displays the posterior means of the linear model's y-intercept and the regression coefficient of `iq`.
-```{r wage-IQ-coef}
-summary(m_wage_iq)$coefficients
-```
-With this we can write down the posterior mean of the regression line
-$$`r round(summary(m_wage_iq)$coefficients[1,1],2)` + `r round(summary(m_wage_iq)$coefficients[2,1],2)` \times \text{IQ}
-$$
-and create a scatterplot with the posterior mean for the regression line laid on top.
+The first column displays the posterior means of the linear model's y-intercept 
+and the regression coefficient of `iq`.
+
+With this we can write down the posterior mean of the regression line 
+$$`r round(summary(m_wage_iq)$coefficients[1,1],3)` + `r round(summary(m_wage_iq)$coefficients[2,1],3)` \times \text{IQ}$$
+and create a scatterplot with the posterior mean for the regression line laid 
+on top.
 
 ```{r reg-with-line}
 ggplot(data = wage, aes(x = iq, y = wage)) +
@@ -169,14 +216,23 @@ ggplot(data = wage, aes(x = iq, y = wage)) +
   stat_smooth(method = "lm", se = FALSE)
 ```  
 
-Under the assumption that the errors $\epsilon_i$ are independent and normally distributed with mean zero and an unknown variance $\sigma^2$, the posterior distributions for the intercept and slope  will have a Student-t distribution under the reference prior with the posterior means and scales equal to the ordinary least squares estimates and standard errors respectively.  We can create 95% credible intervals for the two parameters using the `confint` function:
+Under the assumption that the errors $\epsilon_i$ are independent and normally 
+distributed with mean zero and an unknown variance $\sigma^2$, the posterior 
+distributions for the intercept and slope  will have a Student-t distribution 
+under the reference prior with the posterior means and scales equal to the 
+ordinary least squares estimates and standard errors respectively. We can create 
+95% credible intervals for the two parameters using the `confint` function:
 
 ```{r}
 confint(m_wage_iq)
 ```
 
 <div class="question">
-Fit a new model that uses `educ` (education) to predict average weekly wages. Using the estimates from the R output, write the equation of the posterior mean of the regression line and obtain a 95% credible interval for the coefficients. What does the slope tell us in the context of the relationship between  education and earnings?
+Fit a new model that uses `educ` (education) to predict average weekly wages. 
+Using the estimates from the R output, write the equation of the posterior mean 
+of the regression line and obtain a 95% credible interval for the coefficients. 
+What does the slope tell us in the context of the relationship between education
+and earnings?
 
 * Each additional year of education increases weekly wages by $60.21$.
 * Each additional year of education increases weekly wages by $146.95.
@@ -190,41 +246,66 @@ Fit a new model that uses `educ` (education) to predict average weekly wages. Us
 
 ## Model diagnostics
 
-The Bayesian model specification assumes that the errors are normally distributed with a constant variance and that the mean expected weekly wages is linear in IQ.   We can check these assumption by examining the distribution of the residuals for the model.  
+The Bayesian model specification assumes that the errors are normally 
+distributed with a constant variance and that the mean expected weekly wages is 
+linear in IQ.  We can check these assumption by examining the distribution of 
+the residuals for the model.
 
+In order to do so we will use predicted values, residuals, and standardized 
+residuals of the model we fit earlier. The `augment` function in the `broom` 
+package is going to come in handy here as it takes in a model object (the output 
+of an `lm`) and returns a data frame with columns correspinding to variables 
+in the model as well as predicted values (`.fitted`), residuals (`.resid`), and 
+standardized residuals (`.std.resid`), along with a few others.
 
-**Linearity and Constant Variance**: You already checked if the relationship between weekly wages and IQ is linear using a scatterplot. We should also verify this condition with a plot of the residuals vs. fitted (predicted) values.
+```{r augment}
+m_wage_iq_aug <- augment(m_wage_iq)
+```
+
+**Linearity and Constant Variance**: You already checked if the relationship 
+between weekly wages and IQ is linear using a scatterplot. We should also verify 
+this condition with a plot of the residuals vs. fitted (predicted) values.
 
 ```{r residuals}
-ggplot(data = m_wage_iq, aes(x = .fitted, y = .resid)) +
-  geom_point() +
+ggplot(data = m_wage_iq_aug, aes(x = .fitted, y = .resid)) +
+  geom_point(alpha = 0.6) +
   geom_hline(yintercept = 0, linetype = "dashed") +
-  xlab("Fitted values") +
-  ylab("Residuals")
+  labs(x = "Fitted values", y = "Residuals")
 ```
-Notice here that our model object `m1_wage_iq` can also serve as a data set because stored within it are the fitted values ($\hat{y}$) and the residuals. Also note that we're getting fancy with the code here. After creating the scatterplot on the first layer (first line of code), we overlay a horizontal dashed line at $y = 0$ (to help us check whether residuals are distributed evenly around 0 at each fitted value), and we also adjust the axis labels to be more informative.
 
-A similar plot may also be created using the `plot` function for the regression model
-```{r}
-plot(m_wage_iq, which = 1)
-```
-where the red line shows the"smoothed" mean of the residuals as a function of the fitted values.  If this line deviates greatly from the horizontal line at zero, this can be indicative that the relationship between wages and IQ is not linear.  
+Also note that we're getting fancy with the code here. We set the `alpha` level 
+of our points to a value lower than 1 (`0.6` to be precise) in order to add 
+plot the points with some transparency. This will allow us to more easily 
+identify where the points are more dense vs. more sparse. Then, we overlay a 
+horizontal dashed line at $y = 0$ (to help us check whether residuals are 
+distributed evenly around 0 at each fitted value), and we also adjust the axis 
+labels to be more informative.
 
-**Normality**
-To check this condition, we can look at a histogram of residuals
+**Normality**: To check this condition, we can look at a histogram of residuals
+
 ```{r}
-ggplot(data = m_wage_iq, aes(x = .resid)) +
-  geom_histogram(binwidth = 25) +
+ggplot(data = m_wage_iq_aug, aes(x = .resid)) +
+  geom_histogram(binwidth = 100) +
   xlab("Residuals")
 ```
+
 or a normal probability plot of the residuals
+
 ```{r}
-plot(m_wage_iq, which = 2)
+ggplot(m_wage_iq_aug) +
+  geom_qq(aes(sample = .std.resid)) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed") +
+  labs(x = "Theoretical quantiles", y = "Standardized residuals")
 ```
-where we expect the points to be close to the dashed line, if the assumption of normality holds.  Note that the $y$-axis in the plot uses standardized residuals, which are the residuals divided by their standard deviations so that they will have a normal distribution with mean zero and constant variance if the model holds.
+
+where we expect the points to be close to the dashed line, if the assumption of 
+normality holds. Note that the $y$-axis in the plot uses standardized residuals, 
+which are the residuals divided by their standard deviations so that they will 
+have a normal distribution with mean zero and constant variance if the model 
+holds.
 
 <div class="question">
-Which of the following statements about the residual  plots are false?
+Which of the following statements about the residual plots are false?
 
 * The residuals appear to be randomly distributed around 0.
 * The residuals are strongly left skewed, hence the normal distribution of errors condition is not met.
@@ -236,9 +317,9 @@ Which of the following statements about the residual  plots are false?
 # Type your code for Question 4 here.
 ```
 
-
 <div class="exercise">
-Refit the model by using `educ` (education) as the independent variable. Does your answer to the previous exercise change?
+Refit the model by using `educ` (education) as the independent variable. Does 
+your answer to the previous exercise change?
 </div>
 
 ```{r E2-educ-resid}
@@ -247,14 +328,20 @@ Refit the model by using `educ` (education) as the independent variable. Does yo
 
 ## Linear Regression After Transforming `wage`
 
-One way to accommodate the right-skewness in the residuals is to (natural) log-transform the dependent variable. Note that this is only possible if the variable is strictly positive, since the log of negative value is not defined and $\ln(0) = -\infty$.  Let us try to fit a linear model with log-wage (`lwage`) as the dependent variable.  The next two Questions will be based on this log transformed model.
+One way to accommodate the right-skewness in the residuals is to (natural) 
+log-transform the dependent variable. Note that this is only possible if the 
+variable is strictly positive, since the log of negative value is not defined 
+and $\ln(0) = -\infty$. Let us try to fit a linear model with log-wage (`lwage`) 
+as the dependent variable. The next two questions will be based on this log 
+transformed model.
 
 ```{r lwage-iq-model}
 m_lwage_iq = lm(lwage ~ iq, data = wage)
 ```
 
 <div class="exercise">
-Examine the residuals of this model. Is the assumption of normally distributed residuals reasonable?
+Examine the residuals of this model. Is the assumption of normally distributed 
+residuals reasonable?
 </div>
 
 ```{r E-log-resid}
@@ -262,7 +349,9 @@ Examine the residuals of this model. Is the assumption of normally distributed r
 ```
 
 <div class="exercise">
-Excluding `wage` and `lwage`, select two other variables that you think might be good predictors of `lwage`.  Visualize their relationships with `wage`  and check assumptions using appropriate plots.
+Excluding `wage` and `lwage`, select two other variables that you think might be 
+good predictors of `lwage`. Visualize their relationships with `wage` and check 
+assumptions using appropriate plots.
 </div>
 
 ```{r E1-two-vars-eda}
@@ -270,22 +359,36 @@ Excluding `wage` and `lwage`, select two other variables that you think might be
 ```
 
 ## Outliers
-We declared observations to be outliers with respect to the population model if their deviation or error $\epsilon_i$ was more than $k=3$ standard deviations above or below 0.  Let's use the `Bayes.outlier` function from `BAS`, to calculate these probabilities for the model  `m_lwage_iq1` and display them versus the case number
 
-```{r wage-iq-outliers}
-outliers = Bayes.outlier(m_lwage_iq, k=3)
-ggplot(data.frame(probability = outliers$prob.outlier,
-                  case = 1:length(outliers$prob.outlier)),
-       aes(ymax=probability, ymin=0, x=case)) +
-geom_linerange() +
-ylab("Probability")
+We declared observations to be outliers with respect to the population model if 
+their deviation or error $\epsilon_i$ was more than $k=3$ standard deviations 
+above or below 0. Let's use the `Bayes.outlier` function from `BAS`, to calculate 
+these probabilities for the model  `m_lwage_iq` and plot them against the 
+case number.
+
+We start by calculating the probabilities,
+
+```{r wage-iq-outliers-calculate}
+outliers <- Bayes.outlier(m_lwage_iq, k = 3)
 ```
 
-To identify which cases have probabilities greater than 0.50 of being an outlier, we can use the `which` function to return the indices where the probability > 0.50
+and then store the results in a data frame and plot them.
+
+```{r wage-iq-outliers-plot}
+outliers_df <- data.frame(probability = outliers$prob.outlier,
+                          case = 1:length(outliers$prob.outlier))
+ggplot(outliers_df, aes(ymax = probability, x = case)) +
+  geom_linerange(ymin = 0) +
+  labs(y = "Probability")
+```
+
+To identify which cases have probabilities greater than 0.50 of being an outlier, 
+we can use the `filter` function to return which cases have `probability > 0.50`.
+
 ```{r}
-which(outliers$prob.outlier > 0.50)
+outliers_df %>%
+  filter(probability > 0.50)
 ```
-
 
 <div class="question">
 Using the definition of outlier above, which statement is false?
@@ -294,94 +397,116 @@ Using the definition of outlier above, which statement is false?
 * Case 514 has a probably of close to 1 that it an outlier under the normal error model for regressing `lwage` on `iq`
 * Case 616 has a probably of close to 1 that it an outlier under the normal error model for regressing `lwage` on `iq`
 * Case 784 has a probably of close to 1 that it an outlier under the normal error model for regressing `lwage` on `iq`
-
 </div>
 
 ```{r Q-outlier-prob}
 # Type your code for Question 5 here.
 ```
 
-
-While being $3$ standard deviations seems like an extremely unlikely event for a single observation,
-for large sample sizes, there is often a rather high probability that there will be at least one error $\epsilon_i$ that exceeds $3$ standard deviations above or below zero _a priori_.  We can calculate this as follows
+While being $3$ standard deviations seems like an extremely unlikely event for 
+a single observation, for large sample sizes, there is often a rather high 
+probability that there will be at least one error $\epsilon_i$ that exceeds $3$ 
+standard deviations above or below zero _a priori_. We can calculate this as 
+follows
 
 ```{r}
-n = nrow(wage)
+n <- nrow(wage)
+
 # prob of a case being an outlier:  
 # being below or above 3 standard deviations
 # from 0
-prob.outlier = pnorm(-3) + pnorm(3, lower.tail=F)
+prob_outlier <- pnorm(-3) + pnorm(3, lower.tail = F)
+
 # probability of a signle case not being an outler is 
 # the complement
-prob.not.outlier = 1 - prob.outlier
+prob_not_outlier <- 1 - prob_outlier
+
 # probability of no outliers in the sample of n
 # assuming errors are independent a priori
-prob.no.outliers = prob.not.outlier^n
+prob_no_outliers <- prob_not_outlier^n
+
 # probability of at least one outlier in the sample
 # is the complement of the probability of no outliers
 # in the sample of n
-1 - prob.no.outliers
+1 - prob_no_outliers
 ```
 
-With a sample size of `r nrow(wage)` and using $3$ standard deviations to define outliers, the chance of having at least one outlier in the sample is `r round((1 - prob.no.outliers)*100, 2)`% 
-so the fact that we did discover some outliers is not that surprising. 
+With a sample size of `r nrow(wage)` and using $3$ standard deviations to 
+define outliers, the chance of having at least one outlier in the sample is 
+`r round((1 - prob_no_outliers)*100, 2)`% so the fact that we did discover some 
+outliers is not that surprising. 
 
-So instead of fixing the number of standard deviations to $k=3$, an alternative is fix the prior probability of there being no outliers in the sample, 
+So instead of fixing the number of standard deviations to $k=3$, an alternative 
+is fix the prior probability of there being no outliers in the sample, 
 $$P(\text{no outliers in sample}) = P(\text{observation is not an outlier})^n = 0.95$$
 which we can solve for
-$$ P(\text{observation is not an outlier}) = 0.95^{1/n}
-$$
+
+$$ P(\text{observation is not an outlier}) = 0.95^{1/n} $$
+
 and then solve for  $k$ using the normal quantile function.
+
 ```{r}
-n = nrow(wage)
-prob.obs.not.outlier = .95^(1/n)
-newk = qnorm(.5 + .5*prob.obs.not.outlier)
+prob_obs_not_outlier <- 0.95^(1/n)
+newk <- qnorm(0.5 + 0.5 * prob_obs_not_outlier)
 ```
 
-The function `Bayes.outlier` can also calculate `k` internally if we specify the prior probability of there being no outliers in the sample:
+The function `Bayes.outlier` can also calculate `k` internally if we specify 
+the prior probability of there being no outliers in the sample:
 
 ```{r no-outliers-in-sample}
-outliers = Bayes.outlier(m_lwage_iq, prior.prob=0.95)
+outliers <- Bayes.outlier(m_lwage_iq, prior.prob=0.95)
 ```
 
-
-
 <div class="question">
-Use the new value of $k$ to calculate the posterior probability of being an outlier.  Which observation has a posterior probability of being an outlier that exceeds the prior probability of being an outlier of `r round(1 - prob.obs.not.outlier, 4)`?
+Use the new value of $k$ to calculate the posterior probability of being an 
+outlier. Which observation has a posterior probability of being an outlier 
+that exceeds the prior probability of being an outlier of 
+`r round(1 - prob_obs_not_outlier, 4)`?
 
 * Case 434
 * Case 514
 * Case 616
 * Case 784
-
 </div>
-
-
 
 ```{r Q6-new-outlier-prob}
 # Type your code for Qustion 6 here.
 ```
 
-
-
-
 ## Multiple linear regression
 
-It is evident that wage can be explained by many predictors, such as experience, education, IQ, and so on.  We can include all relevant covariates in a regression model in an attempt to explain as much wage variation as possible.   In addition, sometimes outliers can be explained by changing the model by adding other predictors; let's take a look at multiple regression before removing any cases. 
-
+It is evident that wage can be explained by many predictors, such as experience,  
+education, IQ, and so on. We can include all relevant covariates in a regression 
+model in an attempt to explain as much wage variation as possible. In addition, 
+sometimes outliers can be explained by changing the model by adding other 
+predictors; let's take a look at multiple regression before removing any cases. 
 
 ```{r full-lwage-model}
-m_lwage_full = lm(lwage ~ . - wage, data = wage)
+m_lwage_full <- lm(lwage ~ . - wage, data = wage)
 ```
 
-The use of `. - wage` in the `lm` function tells R to include all covariates in the model except the `wage` variable from the data set.
+The use of `. - wage` in the `lm` function tells R to include all covariates in 
+the model except the `wage` variable from the data set.
 
-However, running this full model has a cost: we will remove observations from our data if some measurements in the variables (e.g. birth order, mother's education, and father's education) are missing. By default, the `lm` function does a complete-case analysis. So it removes any observations with a missing (`NA`) value in one or more of the predictor variables. 
+However, running this full model has a cost: we will remove observations from 
+our data if some measurements in the variables (e.g. birth order, mother's 
+education, and father's education) are missing. By default, the `lm` function 
+does a complete-case analysis. So it removes any observations with a missing 
+(`NA`) value in one or more of the predictor variables. 
 
-Because of these missing values we must make an addition assumption in order for our inferences to be valid. This exclusion of rows with missing values requires that in the data there is no systematic reason for the values to be missing. In other words, our data must be missing at random. For example, if all first-born children did not report their birth order, the data would not be missing at random.  Without any additional information we will assume this is reasonable and use the 663 complete observations (as opposed to the original 935) to fit the model.  Both Bayesian and frequentist methods exist to handle data sets with missing data, but they are beyond the scope of this course.  
+Because of these missing values we must make an addition assumption in order 
+for our inferences to be valid. This exclusion of rows with missing values 
+requires that in the data there is no systematic reason for the values to be 
+missing. In other words, our data must be missing at random. For example, if 
+all first-born children did not report their birth order, the data would not 
+be missing at random. Without any additional information we will assume this 
+is reasonable and use the 663 complete observations (as opposed to the original 
+935) to fit the model. Both Bayesian and frequentist methods exist to handle 
+data sets with missing data, but they are beyond the scope of this course. 
 
 <div class="question">
-From the model, all else begin equal, who would you expect to make more: a married black man or a single non-black man?
+From the model, all else begin equal, who would you expect to make more: a 
+married black man or a single non-black man?
 
 * The married black man
 * The single non-black man
@@ -391,20 +516,30 @@ From the model, all else begin equal, who would you expect to make more: a marri
 # Type your code for Question 7 here.
 ```
 
-As you can see from a quick summary of the full linear model, many coefficients of independent variables are not statistically significant. In previous labs within this specialization, you selected variables based on the values of Adjusted $R^2$. This module introduced the Bayesian Information Criterion (BIC), which is a criterion that can be used for model selection. BIC is based on model fit, while simultaneously penalizing the number of parameters in proportion to the sample size.  We can calculate the BIC of the full linear model using the command below:
+As you can see from a quick summary of the full linear model, many coefficients  of independent variables are not statistically significant. In previous labs 
+within this specialization, you selected variables based on the values of 
+Adjusted $R^2$. This module introduced the Bayesian Information Criterion (BIC), 
+which is a criterion that can be used for model selection. BIC is based on 
+model fit, while simultaneously penalizing the number of parameters in proportion 
+to the sample size. We can calculate the BIC of the full linear model using 
+the command below:
 
 ```{r}
 BIC(m_lwage_full)
 ```
 
-We can compare the BIC of the full model with that of a reduced model.  Let us try to remove birth order from the model. To ensure that the observations remain the same, the data set can be specified as `na.omit(wage)`, which includes only the observations with no missing values in any variables in the data set.
+We can compare the BIC of the full model with that of a reduced model. Let us 
+try to remove birth order from the model. To ensure that the observations remain 
+the same, the data set can be specified as `na.omit(wage)`, which includes only 
+the observations with no missing values in any variables in the data set.
 
 ```{r}
-m_lwage_nobrthord = lm(lwage ~ . -wage -brthord, data = na.omit(wage))
+m_lwage_nobrthord <- lm(lwage ~ . -wage -brthord, data = na.omit(wage))
 BIC(m_lwage_nobrthord)
 ```
 
-As you can see, removing birth order from the regression reduces BIC, which we seek to minimize by model selection.
+As you can see, removing birth order from the regression reduces BIC, which 
+we seek to minimize by model selection.
 
 <div class="question">
 Elimination of which variable from the full model yielded the lowest BIC?
@@ -420,7 +555,13 @@ Elimination of which variable from the full model yielded the lowest BIC?
 ```
 
 <div class="exercise">
-R has a function `stepAIC` from the `MASS` package that will work backwards through the model space, removing variables until the AIC score can be no longer lowered.  It takes all inputs in the full model, and a penalty parameter $k$. The default setting is $k=2$ for the AIC score. Find the best model according to BIC (in which case `k = log(n)` where $n$ is the number of observations).  Remember to use `na.omit(wage)` as your data set. You may type `?stepAIC` in the RStudio Console to get the use and examples of the function `stepAIC`.  
+R has a function `stepAIC` from the `MASS` package that will work backwards 
+through the model space, removing variables until the AIC score can be no longer 
+lowered. It takes all inputs in the full model, and a penalty parameter $k$. 
+The default setting is $k=2$ for the AIC score. Find the best model according 
+to BIC (in which case `k = log(n)` where $n$ is the number of observations). 
+Remember to use `na.omit(wage)` as your data set. You may type `?stepAIC` in 
+the RStudio Console to get the use and examples of the function `stepAIC`. 
 </div>
 
 ```{r E4-step}
@@ -429,37 +570,52 @@ R has a function `stepAIC` from the `MASS` package that will work backwards thro
 
 ## Bayesian model averaging
 
-Often, several models are equally plausible and choosing only one ignores the inherent uncertainty involved in choosing the variables to include in the model.  A way to get around this problem is to implement Bayesian model averaging (BMA), in which multiple models are averaged to obtain posteriors of coefficients and predictions from new data. Dr. Merlise Clyde is the primary author of the R package `BAS`, which implements BMA [@Clyde2018].  We can use this for either implementing BMA or selecting models.
+Often, several models are equally plausible and choosing only one ignores the 
+inherent uncertainty involved in choosing the variables to include in the model. 
+A way to get around this problem is to implement Bayesian model averaging (BMA), 
+in which multiple models are averaged to obtain posteriors of coefficients and 
+predictions from new data. Dr. Merlise Clyde is the primary author of the R 
+package `BAS`, which implements BMA [@Clyde2018]. We can use this for either 
+implementing BMA or selecting models.
 
 We start by applying BMA to the wage data using all $15$ potential predictors.
 
 ```{r bas-wage}
 # Exclude observations with missing values in the data set
-wage_no_na = na.omit(wage)
+wage_no_na <- na.omit(wage)
 
 # Fit the model using Bayesian linear regression, `bas.lm` function in the `BAS` package
-bma_lwage = bas.lm(lwage ~ . -wage, data = wage_no_na,
+bma_lwage <- bas.lm(lwage ~ . -wage, data = wage_no_na,
                    prior = "BIC", 
                    modelprior = uniform())
 
-# Print out the marginal posterior inclusion probabilities for each variable                
+# Print out the marginal posterior inclusion probabilities for each variable   
 bma_lwage
 
-# The top 5 most probably models
+# Top 5 most probably models
 summary(bma_lwage)
 ```
 
-Printing the model object and the summary command gives us both the posterior model inclusion probability for each variable and the most probable models.  For example, the posterior probability that `hours` is included in the model is 0.855.  Further, the most likely model, which has posterior probability of 0.0455, includes an intercept, hours worked, IQ, education, tenure, age, marital status, urban living status, and mother's education.  While a posterior probability of 0.0455 sounds small, it is much larger than the uniform prior probability assigned to it, since there are $2^{15}$ possible models. 
+Printing the model object and the summary command gives us both the posterior 
+model inclusion probability for each variable and the most probable models. For 
+example, the posterior probability that `hours` is included in the model is 
+0.855. Further, the most likely model, which has posterior probability of 0.0455, 
+includes an intercept, hours worked, IQ, education, tenure, age, marital status, 
+urban living status, and mother's education. While a posterior probability of 
+0.0455 sounds small, it is much larger than the uniform prior probability 
+assigned to it, since there are $2^{15}$ possible models. 
 
-It is also possible to visualize the posterior distribution of the coefficients under the model averaging approach.  We graph the posterior distribution of the coefficients of `iq` and `sibs` below.  Note that the subset command dictates which variable is plotted.
+It is also possible to visualize the posterior distribution of the coefficients 
+under the model averaging approach. We graph the posterior distribution of the 
+coefficients of `iq` and `sibs` below. Note that the subset command dictates 
+which variable is plotted.
 
 ```{r vis-BMA}
-par(mfrow = c(1,2))
 # Obtain the coefficients from the model `bma_lwage`
-coef_lwage = coefficients(bma_lwage)
+coef_lwage <- coefficients(bma_lwage)
 
 # `iq` is the 3rd variable, while `sibs` is the 13th variable in the data set
-plot(coef_lwage, subset = c(3,13), ask=FALSE)
+plot(coef_lwage, subset = c(3,13), ask = FALSE)
 ```
 
 We can also provide 95% credible intervals for these coefficients:
@@ -468,24 +624,25 @@ We can also provide 95% credible intervals for these coefficients:
 confint(coef_lwage)
 ```
 
-For Questions 9-10, we'll use a reduced data set which excludes wage, number of siblings, birth order, and parental education. 
+For Questions 9-10, we'll use a reduced data set which excludes wage, number 
+of siblings, birth order, and parental education. 
 
 ```{r rem-vars-wage}
-wage_red = wage %>%
+wage_red <- wage %>%
   select(-wage, -sibs, -brthord, -meduc, -feduc)
-
 ```
 
 Let's use BMA with the Zellner-Siow prior on the regression coefficients:
 
 ```{r}
-bma_lwage_red =  bas.lm(lwage ~ ., data=wage_red,  
-                        prior = 'ZS-null',
-                        modelprior=uniform())
+bma_lwage_red <- bas.lm(lwage ~ ., data = wage_red,  
+                        prior = "ZS-null",
+                        modelprior = uniform())
 ```
 
 <div class="question">
-Based on this reduced data set, according to Bayesian model averaging, which of the following variables has the lowest marginal posterior inclusion probability?
+Based on this reduced data set, according to Bayesian model averaging, which of 
+the following variables has the lowest marginal posterior inclusion probability?
 
 * `kww`
 * `black`
@@ -497,9 +654,9 @@ Based on this reduced data set, according to Bayesian model averaging, which of 
 # Type your code for Question 9 here.
 ```
 
-
 <div class="question">
-True or False: The naive model with all variables included has posterior probability greater than 0.5.
+True or False: The naive model with all variables included has posterior 
+probability greater than 0.5.
 
 * True
 * False
@@ -509,35 +666,60 @@ True or False: The naive model with all variables included has posterior probabi
 # Type your code for Question 10 here.
 ```
 
-
 <div class="exercise">
-Graph the posterior distribution of the coefficient of `age`, using the data set `wage_red`.
+Graph the posterior distribution of the coefficient of `age`, using the data 
+set `wage_red`.
 </div>
 
 ```{r E5-graph}
-par(mfrow = c(1,1))
 # Type your code for Exercise 5 here.
 ```
 
-Because we have log transformed wage, interpretation of coefficients from the output is not as useful for understanding how the different predictors influence wages.  Instead we can interpret coefficients after transforming back to the original units by exponentiation.  The exponential of the posterior mean is not the same as the mean of the exponential, however, the median of wage can be found by exponentiating the median of log wage (i.e. the middle value is still in the middle with transformations that do not change the order of values).   
+Because we have log transformed wage, interpretation of coefficients from the 
+output is not as useful for understanding how the different predictors influence 
+wages. Instead we can interpret coefficients after transforming back to the 
+original units by exponentiation. The exponential of the posterior mean is not 
+the same as the mean of the exponential, however, the median of wage can be 
+found by exponentiating the median of log wage (i.e. the middle value is still 
+in the middle with transformations that do not change the order of values).  
 
 Let's look at the coefficients and 95% credible intervals
 
 ```{r credible_red}
 coef(bma_lwage_red)
-confint(coef(bma_lwage_red))
+coef(bma_lwage_red) %>%
+  confint()
 ```
-The exponential transformation applied to coefficients has a multiplicative effect on the posterior median.  What this means is that a one unit increase in predictor  $X_j$ leads to a $(\exp(\beta_j) -1) \times 100$ percent increase in the median wage [@StatNews83]. For a factor or indicator variable like  `urban`, the posterior median for wages for urban areas (`urban == 1`) will be $(\exp(0.1791) - 1) \times 100$ percent higher than in rural areas  (`urban == 0`). Similarly we can use the same transformation with the credible interval,
+
+The exponential transformation applied to coefficients has a multiplicative 
+effect on the posterior median. What this means is that a one unit increase in 
+predictor  $X_j$ leads to a $(\exp(\beta_j) -1) \times 100$ percent increase in 
+the median wage [@StatNews83]. For a factor or indicator variable like 
+`urban`, the posterior median for wages for urban areas (`urban == 1`) will 
+be $(\exp(0.1791) - 1) \times 100$ percent higher than in rural areas 
+(`urban == 0`). Similarly we can use the same transformation with the credible 
+interval. First, let's calculate the credible interval for the coefficient of 
+`urban` and exponentiate it.
+
 ```{r}
-(exp(confint(coef(bma_lwage_red),
-            parm='urban1')) - 1)*100
+ci_urban <- coef(bma_lwage_red) %>%
+  confint(parm = "urban1") %>%
+  exp()
+
+ci_urban
 ```
+
+Then, we can substract 1 from the bounds of the interval and multipl them by 100 
+to make them a bit more straightforward to interpret
+
+```{r}
+(ci_urban - 1) * 100
+```
+
 Based on this data, there is a 95% chance that median wages for urban areas are
-`r round((exp(confint(coef(bma_lwage_red),
-                     parm='urban1'))[1] - 1)*100, 2)`
+`r round((exp(confint(coef(bma_lwage_red), parm='urban1'))[1] - 1)*100, 2)`
 to 
-`r round((exp(confint(coef(bma_lwage_red),
-            parm='urban1'))[2] - 1)*100,2)` 
+`r round((exp(confint(coef(bma_lwage_red), parm='urban1'))[2] - 1)*100,2)` 
 times higher than in rural regions.
 
 <div class="exercise">
@@ -547,32 +729,42 @@ Find a 95% credible interval for the coefficient of `educ` and provide an interp
 ```{r E6-CI-lwage}
 # Type your code for Exercise 6 here
 ```
- 
 
 ## Prediction with BAS
 
-Similar to last week's lab, we will be using Bayesian predictive distribution for predictions and interpretation of predictions. Simulation is used in `BAS` to construct predictive intervals with Bayesian Model Averaging, while exact inference is often possible with predictive intervals under model selection.
+Similar to last week's lab, we will be using Bayesian predictive distribution 
+for predictions and interpretation of predictions. Simulation is used in `BAS` 
+to construct predictive intervals with Bayesian Model Averaging, while exact 
+inference is often possible with predictive intervals under model selection.
 
-Returning to the wage data set, let us find the predictive values under the *Best Predictive Model* (`BPM`), the one which has predictions closest to BMA and corresponding posterior standard deviations.
+Returning to the wage data set, let us find the predictive values under the 
+*Best Predictive Model* (`BPM`), the one which has predictions closest to BMA 
+and corresponding posterior standard deviations.
 
 ```{r bma_predict, cache=TRUE}
-BPM_pred_lwage =  predict(bma_lwage, estimator="BPM", se.fit=TRUE)
-BPM_model_lwage = BPM_pred_lwage$bestmodel+1
+BPM_pred_lwage <- predict(bma_lwage, estimator = "BPM", se.fit = TRUE)
+BPM_model_lwage <- BPM_pred_lwage$bestmodel + 1
 bma_lwage$namesx[BPM_model_lwage]
 ```
-In the code above, the indices for the model start with $0$ the intercept, so we need to add one to extract the variable names.
-We can compare this to the Highest probability model that we found earlier and the *Median Probability Model* (`MPM`)
+
+In the code above, the indices for the model start with $0$ the intercept, so 
+we need to add one to extract the variable names. We can compare this to the 
+Highest probability model that we found earlier and the 
+*Median Probability Model* (`MPM`)
 
 ```{r MPM}
-MPM_pred_lwage =  predict(bma_lwage, estimator="MPM")
-bma_lwage$namesx[MPM_pred_lwage$bestmodel+1]
+MPM_pred_lwage <- predict(bma_lwage, estimator = "MPM")
+bma_lwage$namesx[MPM_pred_lwage$bestmodel + 1]
 ```
 
-The `MPM` includes `exper` in addition to all of the variables in the *Highest Probability Model* (`HPM`), while the `BPM` includes  `kww` in addition to all of the variables in the `MPM`. 
+The `MPM` includes `exper` in addition to all of the variables in the 
+*Highest Probability Model* (`HPM`), while the `BPM` includes  `kww` in 
+addition to all of the variables in the `MPM`. 
 
 <div class="question">
-Using the reduced data, what covariates are included in **all** of the best predictive model, the median probability model and the highest posterior probability model?
-
+Using the reduced data, what covariates are included in **all** of the best 
+predictive model, the median probability model and the highest posterior 
+probability model?
 
 * `kww`, `married`, `urban`
 * `married`, `age`, `black`
@@ -584,24 +776,29 @@ Using the reduced data, what covariates are included in **all** of the best pred
 # Type your code for Question 11 here.
 ```
 
-Let us turn to examine what characteristics lead to the highest wages in the `BPM` model.
+Let us turn to examine what characteristics lead to the highest wages in the 
+`BPM` model.
 
 ```{r opt_wage}
 # Find the index of observation with the largest fitted value
-opt = which.max(BPM_pred_lwage$fit)
+opt <- which.max(BPM_pred_lwage$fit)
 
-# Extract the row with this observation and get the tranpose of this row (for easy visualization) 
-t(wage_no_na[opt, ])
+# Extract the row with this observation and glimpse at the row
+wage_no_na %>% 
+  slice(opt) %>%
+  glimpse()
 ```
 
 A 95% credible interval for predicting log wages can be obtained by
 
 ```{r ci}
-ci_lwage = confint(BPM_pred_lwage, parm="pred")
+ci_lwage <- confint(BPM_pred_lwage, parm = "pred")
 ci_lwage[opt,]
 ```
 
-To translate this back to `wage` (recall that we regress `lwage`), we may exponentiate the interval to obtain a 95% prediction interval for the wages of an individual with covariates at the levels of the individual specified by `opt`.
+To translate this back to `wage` (recall that we regress `lwage`), we may 
+exponentiate the interval to obtain a 95% prediction interval for the wages of 
+an individual with covariates at the levels of the individual specified by `opt`.
 
 ```{r ci_wage}
 exp(ci_lwage[opt,])
@@ -610,15 +807,15 @@ exp(ci_lwage[opt,])
 If we were to use BMA, the interval would be 
 
 ```{r}
-BMA_pred_lwage =  predict(bma_lwage, estimator="BMA", se.fit=TRUE)
-ci_bma_lwage = confint(BMA_pred_lwage, estimator="BMA")
-opt_bma = which.max(BMA_pred_lwage$fit)
-exp(ci_bma_lwage[opt_bma,])
+BMA_pred_lwage <- predict(bma_lwage, estimator = "BMA", se.fit = TRUE)
+ci_bma_lwage <- confint(BMA_pred_lwage, estimator = "BMA")
+opt_bma <- which.max(BMA_pred_lwage$fit)
+exp(ci_bma_lwage[opt_bma, ])
 ```
 
 <div class="question">
-Using the reduced data, a 95% prediction interval for the individual who is predicted to have the highest predicted wages under `BPM` would be.
-
+Using the reduced data, a 95% prediction interval for the individual who is 
+predicted to have the highest predicted wages under `BPM` would be.
 
 * [414.3266, 1717.8644]
 * [782.0124, 2950.5898]
@@ -629,6 +826,10 @@ Using the reduced data, a 95% prediction interval for the individual who is pred
 ```{r Q12-cred-interval}
 # Type your code for Question 12 here.
 ```
+
+<div class="license">
+This work is licensed under [GNU General Public License v3.0](https://www.gnu.org/licenses/quick-guide-gplv3.html).
+</div>
 
 ## References
 
