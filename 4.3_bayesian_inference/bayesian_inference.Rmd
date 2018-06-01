@@ -77,7 +77,7 @@ Another useful function is `summary` which provides the range, quartiles, and
 means for numeric variables and counts for categorical variables. Additionally, 
 if there are any missing observations (denoted `NA`), summary will provide the 
 number of missing cases for each variable. Note that the output of the summary 
-function can be too long and difficult to visually parse and interpret if the 
+function can be too long and difficult to parse  visually and interpret if the 
 dataset has a large number of variables.
 
 ```{r nc-summary}
