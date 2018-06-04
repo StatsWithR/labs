@@ -142,8 +142,8 @@ full-term or premie. We can use some of the functions of `dplyr` to create a
 new dataframe to limit the analysis to full term births.
 
 ```{r nc-omitNA}
-nc.fullterm = filter(nc, premie == 'full term')
-summary(nc.fullterm)
+nc_fullterm = filter(nc, premie == 'full term')
+summary(nc_fullterm)
 ```
 
 The `filter` function selects variables all variables from the dataframe `nc` 
@@ -164,7 +164,7 @@ interval.
 
 
 ```{r mean-inference, fig.align='center', out.width = "70%"}
-bayes_inference(y = weight, data = nc.fullterm, 
+bayes_inference(y = weight, data = nc_fullterm, 
                 statistic = "mean", type = "ci",  
                 prior_family = "JZS", mu_0 = 7.7, rscale = 1,
                 method = "simulation",
@@ -173,7 +173,7 @@ bayes_inference(y = weight, data = nc.fullterm,
 
 Let's look at the meanings of the arguments of this custom function. The first 
 argument `y` specifies the response variable that we are interested in: `weight`.
-The second argument, `data`, specifies the dataset `nc.fullterm` that contains 
+The second argument, `data`, specifies the dataset `nc_fullterm` that contains 
 the variable `weight`. The third argument `statistic` is the sample statistic 
 we're using, or similarly, the population parameter we're estimating. The 
 argument `type` specifies the type of inference that we want: credible 
@@ -235,8 +235,7 @@ describe the evidence against $H_1$ from your results for the hypothesis test?
 * Very Strong
 </div>
 
-
-```{r HT-weight}
+```{r Q4-HT-weight}
 # Type your code for the Exercise here.
 ```
 
@@ -247,10 +246,10 @@ interpretation of predictions. Much of Bayesian prediction is done using
 simulation techniques, some of which was discussed near the end of this module. 
 We will go over a simple simulation example to obtain the predictive distribution 
 of the variable `weight` using the output of `bayes_inference` which we will 
-save to the object `weight.post`:
+save to the object `weight_post`:
 
 ```{r weight-inference, fig.align='center', out.width = "70%"}
-weight.post = bayes_inference(y = weight, data = nc.fullterm, 
+weight_post = bayes_inference(y = weight, data = nc_fullterm, 
                               statistic = "mean", type = "ci",  
                               prior_family = "JZS", mu_0 = 7.7, rscale = 1,
                               method = "simulation",
@@ -260,7 +259,7 @@ weight.post = bayes_inference(y = weight, data = nc.fullterm,
 The `names` function can list the output or objects that are stored in the object created by `bayes_inference`:
 
 ```{r}
-names(weight.post)
+names(weight_post)
 ```
 
 In particular, the `samples` object is a `matrix` or table which contain the draws from the MCMC 
@@ -279,16 +278,16 @@ distribution for the birth weight for any new observation $y_{1001}$.
 We'll first convert our `samples` into a dataframe and then use `mutate` the create draws from the predictive distribution using `rnorm`:
 
 ```{r pred-distribution}
-samples = as.data.frame(weight.post$samples)
+samples = as.data.frame(weight_post$samples)
 nsim = nrow(samples)
-samples = mutate(samples, y.pred = rnorm(nsim, mu, sqrt(sig2)))
+samples = mutate(samples, y_pred = rnorm(nsim, mu, sqrt(sig2)))
 ```
 
 We can view an estimate of the predictive distribution, by looking at a 
 smoothed version of the histogram of the simulated data:
 
 ```{r preddens, fig.align="center", out.width="70%"}
-ggplot(data = samples, aes(x = y.pred)) + 
+ggplot(data = samples, aes(x = y_pred)) + 
   geom_histogram(aes(y = ..density..), bins = 100) +
   geom_density() + 
   xlab(expression(y[new]))
@@ -302,26 +301,29 @@ Using the `quantile` function `R` we can find the 0.025 and 0.975, as well as
 median (0.50) quantiles of the predictive distribution:
 
 ```{r}
-dplyr::select(samples, mu, y.pred) %>%
+dplyr::select(samples, mu, y_pred) %>%
   map(quantile, probs=c(0.025, 0.50, 0.975))
 ```
-In the above code we are using `dplyr:select` to select just the columns `mu` and `y.pred` from `samples`.  The usage of `dplyr:` preceeding `select`, ensures that we are using the `select` function from the `dplyr` package to avoid possible name conflicts, as several packages have a `select` function.  We are also taking advantage of the pipe operator to send the selected columns to the `map` function to apply the `quantile` function to each of the selected columns for the probabilities in the argument `probs` to `quantile`.
+In the above code we are using `dplyr:select` to select just the columns `mu` and `y_pred` from `samples`.  The usage of `dplyr:` preceeding `select`, ensures that we are using the `select` function from the `dplyr` package to avoid possible name conflicts, as several packages have a `select` function.  We are also taking advantage of the pipe operator to send the selected columns to the `map` function to apply the `quantile` function to each of the selected columns for the probabilities in the argument `probs` to `quantile`.
 
 <div class="question">
 For predicting the birth weight of a new full term baby in NC, 
+
 * there is a 95% chance that their birth weight will be 7.4 to 7.5 pounds.
 * there is a 95% chance that their birth weight will be on average 7.4 to 7.5 pounds.
-* there is 50% chance that their birth weight will be 7.4 pounds.
 * there is a 95% chance that their birth weight will be 5.4 to 9.5 pounds.
-* (6.380, 8.060)
+* there is 50% chance that their birth weight will be 7.4 pounds.
 </div>
 
 ```{r Q5-cred-int}
 # Type your code for Question 5 here.
 ```
 
+
+<div class="exercise">
 Repeat the above analysis but find the predictive distribution for babies that 
 were premature. 
+</div>
 
 ```{r E2-t-dist}
 # Type your code for Exersice 2 here.
@@ -369,7 +371,7 @@ groups using the `mean` function, where the `%>%` pipe operator takes the output
 of one function and then *pipes* it into the next function.
 
 ```{r by-means}
-nc.fullterm %>%
+nc_fullterm %>%
   group_by(habit) %>%
   summarise(mean_weight = mean(weight))
 ```
@@ -386,7 +388,7 @@ except now we will provide `habit` as an explanatory variable (argument
 (argument `method = "theoretical"`).
 
 ```{r ht-habit-weight}
-bayes_inference(y = weight, x = habit, data = nc.fullterm, 
+bayes_inference(y = weight, x = habit, data = nc_fullterm, 
                 statistic = "mean", 
                 type = "ht", alternative = "twosided", null = 0, 
                 prior = "JZS", rscale = 1, 
@@ -413,7 +415,7 @@ $a+b = 1$.)
 * Stay the same
 </div>
 
-```{r Q9-ht-habit-weight-increase-H2}
+```{r Q8-ht-habit-weight-increase-H2}
 # Type your code for the question here.
 ```
 
@@ -429,7 +431,7 @@ in the Cauchy prior `rscale = sqrt(2)/2`?
 * Stay the same
 </div>
 
-```{r Q10-ht-gender-weight-increase-rscale}
+```{r Q9-ht-gender-weight-increase-rscale}
 # Type your code for  Question 9 here.
 ```
 
@@ -454,7 +456,7 @@ weights for nonsmokers and smoker:
 * there is a 95% chance that babies born to nonsmoker mothers are on average 0.11 to 0.54 pounds heavier at birth than babies born to smoker mothers. 
 </div>
 
-```{r Q9-ci-weight-habit-increase}
+```{r Q10-ci-weight-habit-increase}
 # Type your code for Question 10 here.
 ```
 
@@ -501,7 +503,7 @@ We first analyze the `control` group data. We subset the data according to the
 set `PPS.control`.
 
 ```{r select-control}
-PSS.control = PrisonStress %>%
+pss_control = PrisonStress %>%
   filter(Group == "Control") %>%
   mutate(diff = PSSbefore - PSSafter)
 ```
@@ -520,7 +522,7 @@ similar to the one we used for inference for one mean, except that we need to
 set `null = 0`, because we are comparing the mean of the difference to 0.
 
 ```{r ht-control-diff}
-bayes_inference(y = diff, data = PSS.control, 
+bayes_inference(y = diff, data = pss_control, 
                 statistic = "mean",
                 type = "ht", alternative = "twosided", null = 0, 
                 prior = "JZS", rscale = 1, 
