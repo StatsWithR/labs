@@ -743,18 +743,23 @@ and corresponding posterior standard deviations.
 
 ```{r bma_predict, cache=TRUE}
 BPM_pred_lwage <- predict(bma_lwage, estimator = "BPM", se.fit = TRUE)
-BPM_model_lwage <- BPM_pred_lwage$bestmodel + 1
-bma_lwage$namesx[BPM_model_lwage]
+variable.names(BPM_pred_lwage)
 ```
 
-In the code above, the indices for the model start with $0$ the intercept, so 
-we need to add one to extract the variable names. We can compare this to the 
-Highest probability model that we found earlier and the 
+In the code above, the function `variable.names` can be used to extract the names of all of the predictors in the Best Probabilty model.
+This can be used to identify the variables in the  *Highest Probability Model* (`HPM`) 
+
+```{r HPM}
+HPM_pred_lwage <- predict(bma_lwage, estimator = "HPM")
+variable.names(HPM_pred_lwage$bestmodel)
+```
+
+and the 
 *Median Probability Model* (`MPM`)
 
 ```{r MPM}
 MPM_pred_lwage <- predict(bma_lwage, estimator = "MPM")
-bma_lwage$namesx[MPM_pred_lwage$bestmodel + 1]
+variable.names(MPM_pred_lwage$bestmodel)
 ```
 
 The `MPM` includes `exper` in addition to all of the variables in the 
