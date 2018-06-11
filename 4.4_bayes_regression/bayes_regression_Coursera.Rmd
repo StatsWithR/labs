@@ -765,15 +765,14 @@ The `MPM` includes `exper` in addition to all of the variables in the
 addition to all of the variables in the `MPM`. 
 
 <div class="question">
-Using the reduced data, what covariates are included in **all** of the best 
-predictive model, the median probability model and the highest posterior 
+Based on these results which covariates are included in **all** of the following: the best 
+predictive model, the median probability model, and the highest posterior 
 probability model?
 
 * `kww`, `married`, `urban`
 * `married`, `age`, `black`
 * `black`, `south`, `married`
 * `meduc`, `urban`, `married`
-
 </div>
 ```{r Q11}
 # Type your code for Question 11 here.
@@ -810,14 +809,14 @@ exp(ci_lwage[opt,])
 If we were to use BMA, the interval would be 
 
 ```{r}
-BMA_pred_lwage <- predict(bma_lwage_red, estimator = "BMA", se.fit = TRUE)
+BMA_pred_lwage <- predict(bma_lwage, estimator = "BMA", se.fit = TRUE)
 ci_bma_lwage <- confint(BMA_pred_lwage, estimator = "BMA")
 opt_bma <- which.max(BMA_pred_lwage$fit)
 exp(ci_bma_lwage[opt_bma, ])
 ```
 
 <div class="question">
-Using the reduced data, a 95% prediction interval for the individual who is 
+Using this BMA, a 95% prediction interval for the individual who is 
 predicted to have the highest predicted wages under `BPM` would be.
 
 * [414.3266, 1717.8644]
