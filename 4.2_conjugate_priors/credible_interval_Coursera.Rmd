@@ -226,7 +226,7 @@ shown above. Use the credible interval app to answer this question.
 Which of the following is the correct Bayesian interpretation of this interval?
 
 * The probability that the true proportion of females lies in this interval is either 0 or 1.
-* The probability that the true proportion of females lies in this interval is 0.95.</li>
+* The probability that the true proportion of females lies in this interval is 0.95.
 * 95\% of the time the true proportion of females is in this interval. 
 * 95\% of true proportions of females are in this interval. 
 </div>

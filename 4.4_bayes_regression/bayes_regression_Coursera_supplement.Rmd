@@ -52,7 +52,7 @@ While `BMA` is the best,  followed by `BPM`, they are all pretty close in this c
 
 This can be used to compare different prior distributions (say `BIC` versus `ZS-null`) or other options.
 
-<div id="exercise">
+<div class="exercise">
 **Exercise:**   Using the reduced data set, compare the average prediction error using the four different estimators with `BIC`.  What happens if you switch to using `prior="ZS-null"' with `bas.lm`
 </div>
 
@@ -112,7 +112,7 @@ diagnostics(outliers_lwage, type="pip")
 
 The diagnostic plot looks better, with the larger inclusion probabilities in reasonable agreement, however, several below 0.3 could benefit from running longer. This is probably adequate for the outlier detection and implementing model averaging, however, as predicted values tend to converge faster than probabilities.
 
-<div id="exercise">
+<div class="exercise">
 **Exercise:**  Fit the outlier model with the reduced dataset. Create a diagnostic plot with the output and determine how many MCMC iterations are needed.  
 </div>
 
