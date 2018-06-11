@@ -820,10 +820,10 @@ exp(ci_bma_lwage[opt_bma, ])
 Using the reduced data, a 95% prediction interval for the individual who is 
 predicted to have the highest predicted wages under `BPM` would be.
 
-* [414.3266, 1717.8644]
-* [782.0124, 2950.5898]
-* [782.0124, 3154.0718]
-* [706.4599, 2950.5898]
+* [414, 1717]
+* [782, 1571]
+* [782, 3154]
+* [706, 2950]
 </div>
 
 ```{r Q12-cred-interval}
