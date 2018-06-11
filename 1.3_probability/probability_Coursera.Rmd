@@ -3,7 +3,7 @@ title: "Probability"
 output: statsr:::statswithr_lab
 ---
 
-<div id="instructions">
+<div class="instructions">
 Complete all **Exercises**, and submit answers to **Questions** on the Coursera 
 platform.
 </div>
@@ -73,19 +73,21 @@ Within the nine shot attempts, there are six streaks, which are separated by a
 "|" above. Their lengths are one, zero, two, zero, zero, zero (in order of 
 occurrence).
 
-1.  Fill in the blank: A streak length of 1 means one \_\_\_ followed by one miss.
-<ol>
-<li> hit </li>
-<li> miss </li>
-</ol>
+<div class="question">
+ Fill in the blank: A streak length of 1 means one \_\_\_ followed by one miss.
+
+* hit 
+* miss 
+</div>
 
 
-2.  Fill in the blank: A streak length of 0 means one \_\_\_ which must occur after a 
+<div class="question">
+ Fill in the blank: A streak length of 0 means one \_\_\_ which must occur after a 
 miss that ended the preceeding streak.
-<ol>
-<li> hit </li>
-<li> miss </li>
-</ol>
+
+* hit 
+* miss 
+</div>
 
 Counting streak lengths manually for all 133 shots would get tedious, so we'll
 use the custom function `calc_streak` to calculate them, and store the results
@@ -102,15 +104,16 @@ ggplot(data = kobe_streak, aes(x = length)) +
   geom_histogram(binwidth = 1)
 ```
 
-3.  Which of the following is false about the distribution of Kobe's streak lengths 
+<div class="question">
+ Which of the following is false about the distribution of Kobe's streak lengths 
 from the 2009 NBA finals. 
-<ol>
-<li> The distribution of Kobe's streaks is unimodal and right skewed. </li>
-<li> The typical length of a streak is 0 since the median of the distribution is at 0. </li>
-<li> The IQR of the distribution is 1. 
-<li> The longest streak of baskets is of length 4. </li>
-<li> The shortest streak is of length 1.</li>
-</ol>
+
+* The distribution of Kobe's streaks is unimodal and right skewed. 
+* The typical length of a streak is 0 since the median of the distribution is at 0. 
+* The IQR of the distribution is 1. 
+* The longest streak of baskets is of length 4. 
+* The shortest streak is of length 1.
+</div>
 
 ## Compared to What?
 
@@ -210,8 +213,8 @@ think of the outcome space as a bag of 10 chips, where 2 chips are labeled
 "head" and 8 chips "tail". Therefore at each draw, the probability of drawing a 
 chip that says "head"" is 20%, and "tail" is 80%.
 
-<div id="exercise">
-**Exercise**: In your simulation of flipping the unfair coin 100 times, how many flips came up heads?
+<div class="exercise">
+In your simulation of flipping the unfair coin 100 times, how many flips came up heads?
 </div>
 
 In a sense, we've shrunken the size of the slip of paper that says "heads", 
@@ -240,8 +243,8 @@ To make a valid comparison between Kobe and our simulated independent shooter,
 we need to align both their shooting percentage and the number of attempted shots.
 
 
-<div id="exercise">
-**Exercise**: What change needs to be made to the `sample` function so that it reflects a shooting percentage of 45%? Make this adjustment, then run a simulation to sample 133 shots. Assign the output of this simulation to a new object called `sim_basket`.
+<div class="exercise">
+What change needs to be made to the `sample` function so that it reflects a shooting percentage of 45%? Make this adjustment, then run a simulation to sample 133 shots. Assign the output of this simulation to a new object called `sim_basket`.
 </div>
 ```{r}
 # type your code for the Exercise here, and Knit
@@ -264,44 +267,45 @@ a hot hand.
 
 ### Comparing Kobe Bryant to the Independent Shooter
 
-<div id="exercise">
-**Exercise**: Using `calc_streak`, compute the streak lengths of `sim_basket`, and save the results in a data frame called `sim_streak`. Note that since the `sim_streak` object is just a vector and not a variable in a data frame, we don't need to first select it from a data frame like we did earlier when we calculated the streak lengths for Kobe's shots.
+<div class="exercise">
+Using `calc_streak`, compute the streak lengths of `sim_basket`, and save the results in a data frame called `sim_streak`. Note that since the `sim_streak` object is just a vector and not a variable in a data frame, we don't need to first select it from a data frame like we did earlier when we calculated the streak lengths for Kobe's shots.
 </div>
 ```{r sim-streak-lengths}
 # type your code for the Exercise here, and Knit
 
 ```
    
-<div id="exercise">
-**Exercise**: Make a plot of the distribution of simulated streak lengths of the independent shooter. What is the typical streak length for this simulated independent shooter with a 45% shooting percentage? How long is the player's longest streak of baskets in 133 shots?
+<div class="exercise">
+Make a plot of the distribution of simulated streak lengths of the independent shooter. What is the typical streak length for this simulated independent shooter with a 45% shooting percentage? How long is the player's longest streak of baskets in 133 shots?
 </div>
 ```{r plot-sim-streaks}
 # type your code for the Exercise here, and Knit
 
 ```
 
-4.  If you were to run the simulation of the independent shooter a second time, how 
+<div class="question">
+If you were to run the simulation of the independent shooter a second time, how 
 would you expect its streak distribution to compare to the distribution from the 
 exercise above? 
-<ol>
-<li> Exactly the same  </li>
-<li> Somewhat similar </li>
-<li> Totally different </li>
-</ol>
+* Exactly the same  
+* Somewhat similar 
+* Totally different 
+</div>
 
 
-5.  How does Kobe Bryant's distribution of streak lengths compare to the distribution 
+<div class="question">
+How does Kobe Bryant's distribution of streak lengths compare to the distribution 
 of streak lengths for the simulated shooter? Using this comparison, do you have 
 evidence that the hot hand model fits Kobe's shooting patterns?
-<ol>
-<li> The distributions look very similar. Therefore, there doesn't appear to be evidence for Kobe Bryant's hot hand. </li>
-<li> The distributions look very similar. Therefore, there appears to be evidence for Kobe Bryant's hot hand. </li>
-<li> The distributions look very different. Therefore, there doesn't appear to be evidence for Kobe Bryant's hot hand. </li>
-<li> The distributions look very different. Therefore, there appears to be evidence for Kobe Bryant's hot hand. </li>
-</ol>
 
-<div id="exercise">
-**Exercise**: What concepts from the course videos are covered in this lab? What 
+* The distributions look very similar. Therefore, there doesn't appear to be evidence for Kobe Bryant's hot hand. 
+* The distributions look very similar. Therefore, there appears to be evidence for Kobe Bryant's hot hand. 
+* The distributions look very different. Therefore, there doesn't appear to be evidence for Kobe Bryant's hot hand. 
+* The distributions look very different. Therefore, there appears to be evidence for Kobe Bryant's hot hand. 
+</div>
+
+<div class="exercise">
+What concepts from the course videos are covered in this lab? What 
 concepts, if any, are not covered in the videos? Have you seen these concepts 
 elsewhere, e.g. textbook, previous labs, or practice problems?
 </div>
