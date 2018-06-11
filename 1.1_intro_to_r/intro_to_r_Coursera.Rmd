@@ -7,6 +7,8 @@ output: statsr:::statswithr_lab
 Complete all **Exercises**, and submit answers to **Questions** on the Coursera platform.
 </div>
 
+## Introduction
+
 The goal of this lab is to introduce you to R and RStudio, which you'll be using
 throughout the course both to learn the statistical concepts discussed in the 
 course and to analyze real data and come to informed conclusions. To straighten 
