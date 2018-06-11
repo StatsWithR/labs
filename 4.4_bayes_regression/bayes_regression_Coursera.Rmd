@@ -816,8 +816,8 @@ exp(ci_bma_lwage[opt_bma, ])
 ```
 
 <div class="question">
-Using this BMA, a 95% prediction interval for the individual who is 
-predicted to have the highest predicted wages under `BPM` would be.
+Repeat these calculations for a 95% prediction interval for the individual who is 
+predicted to have the highest predicted wages based on the best predictive model.
 
 * [414, 1717]
 * [782, 1571]
