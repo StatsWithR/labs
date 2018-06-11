@@ -4,7 +4,7 @@ output: statsr:::statswithr_lab
 runtime: shiny
 ---
 
-<div id="instructions">
+<div class="instructions">
 Complete all **Exercises**, and submit answers to **Questions** on the Coursera 
 platform.
 </div>
@@ -72,14 +72,15 @@ ames %>%
             pop_q3 = quantile(area, 0.75))  # third quartile, 75th percentile
 ```
 
-1.  Which of the following is **false**?
-<ol>
-<li> The distribution of areas of houses in Ames is unimodal and right-skewed. </li>
-<li> 50\% of houses in Ames are smaller than 1,499.69 square feet. </li>
-<li> The middle 50\% of the houses range between approximately 1,126 square feet and 1,742.7 square feet. </li>
-<li> The IQR is approximately 616.7 square feet. </li>
-<li> The smallest house is 334 square feet and the largest is 5,642 square feet. </li>
-</ol>
+<div class="question">
+Which of the following is **false**?
+
+* The distribution of areas of houses in Ames is unimodal and right-skewed. 
+* 50\% of houses in Ames are smaller than 1,499.69 square feet. 
+* The middle 50\% of the houses range between approximately 1,126 square feet and 1,742.7 square feet. 
+* The IQR is approximately 616.7 square feet. 
+* The smallest house is 334 square feet and the largest is 5,642 square feet. 
+</div>
 
 
 ## The unknown sampling distribution
@@ -103,8 +104,8 @@ Assessor's database and pulling up the files on 50 random home sales. Working
 with these 50 files would be considerably simpler than working with all 2930 
 home sales.
 
-<div id="exercise">
-**Exercise**: Describe the distribution of this sample? How does it compare to the distribution of the population? **Hint:** `sample_n` function takes a random sample of observations (i.e. rows) from the dataset, you can still refer to the variables in the dataset with the same names. Code you used in the previous exercise will also be helpful for visualizing and summarizing the sample, however be careful to not label values `mu` and `sigma` anymore since these are sample statistics, not population parameters. You can customize the labels of any of the statistics to indicate that these come from the sample.
+<div class="exercise">
+Describe the distribution of this sample? How does it compare to the distribution of the population? **Hint:** `sample_n` function takes a random sample of observations (i.e. rows) from the dataset, you can still refer to the variables in the dataset with the same names. Code you used in the previous exercise will also be helpful for visualizing and summarizing the sample, however be careful to not label values `mu` and `sigma` anymore since these are sample statistics, not population parameters. You can customize the labels of any of the statistics to indicate that these come from the sample.
 </div>
 ```{r samp1-dist}
 # type your code for the Exercise here, and Run Document
@@ -126,12 +127,13 @@ though, the sample mean turns out to be a pretty good estimate of the average
 living area, and we were able to get it by sampling less than 3\% of the 
 population.
 
-2. Suppose we took two more samples, one of size 100 and one of size 1000. Which would you think would provide a more accurate estimate of the population mean?
-<ol>
-<li> Sample size of 50. </li>
-<li> Sample size of 100. </li>
-<li> Sample size of 1000. </li>
-</ol>
+<div class="question">
+ Suppose we took two more samples, one of size 100 and one of size 1000. Which would you think would provide a more accurate estimate of the population mean?
+
+* Sample size of 50. 
+* Sample size of 100. 
+* Sample size of 1000. 
+</div>
 
 Let's take one more sample of size 50, and view the mean area in this sample:
 ```{r mean-samp2}
@@ -164,8 +166,8 @@ Here we use R to take 15,000 samples of size 50 from the population, calculate
 the mean of each sample, and store each result in a vector called 
 `sample_means50`. Next, we review how this set of code works.
 
-<div id="exercise">
-**Exercise**: How many elements are there in `sample_means50`?  Describe the sampling distribution, and be sure to specifically note its center. Make sure to include a plot of the distribution in your answer.
+<div class="exercise">
+How many elements are there in `sample_means50`?  Describe the sampling distribution, and be sure to specifically note its center. Make sure to include a plot of the distribution in your answer.
 </div>
 ```{r sampling-dist}
 # type your code for the Exercise here, and Run Document
@@ -195,33 +197,34 @@ as well as store the resulting sample means each time in a separate vector.
 Note that for each of the 15,000 times we computed a mean, we did so from a 
 **different** sample!
 
-<div id="exercise">
-**Exercise**: To make sure you understand how sampling distributions are built, and exactly what the `sample_n` and `do` function do, try modifying the code to create a sampling distribution of **25 sample means** from **samples of size 10**, and put them in a data frame named `sample_means_small`. Print the output. How many observations are there in this object called `sample_means_small`? What does each observation represent?
+<div class="exercise">
+To make sure you understand how sampling distributions are built, and exactly what the `sample_n` and `do` function do, try modifying the code to create a sampling distribution of **25 sample means** from **samples of size 10**, and put them in a data frame named `sample_means_small`. Print the output. How many observations are there in this object called `sample_means_small`? What does each observation represent?
 </div>
 ```{r practice-sampling-dist}
 # type your code for the Exercise here, and Run Document
 
 ```
 
-3. How many elements are there in this object called `sample_means_small`? 
-<ol>
-<li> 0 </li>
-<li> 3 </li>
-<li> 25 </li>
-<li> 100 </li>
-<li> 5,000 </li>
-</ol>
+<div class="question"> How many elements are there in this object called `sample_means_small`? 
+
+* 0 
+* 3 
+* 25 
+* 100 
+* 5,000 
+</div>
 ```{r sample-means-small}
 # type your code for Question 3 here, and Run Document
 
 ```
 
-4. Which of the following is **true** about the elements in the sampling distributions you created?
-<ol>
-<li> Each element represents a mean square footage from a simple random sample of 10 houses. </li>
-<li> Each element represents the square footage of a house. </li>
-<li> Each element represents the true population mean of square footage of houses. </li>
-</ol>
+<div class="question">
+ Which of the following is **true** about the elements in the sampling distributions you created?
+
+* Each element represents a mean square footage from a simple random sample of 10 houses. 
+* Each element represents the square footage of a house. 
+* Each element represents the true population mean of square footage of houses. 
+</div>
 
 
 ## Sample size and the sampling distribution
@@ -243,39 +246,40 @@ indicates how much variability is induced by sampling only 50 home sales.
 In the remainder of this section we will work on getting a sense of the effect that 
 sample size has on our sampling distribution.
 
-<div id="exercise">
-**Exercise**: Use the app below to create sampling distributions of means of `area`s from samples of size 10, 50, and 100. Use 5,000 simulations. What does each observation in the sampling distribution represent? How does the mean, standard error, and shape of the sampling distribution change as the sample size increases? How (if at all) do these values change if you increase the number of simulations?
+<div class="exercise">
+Use the app below to create sampling distributions of means of `area`s from samples of size 10, 50, and 100. Use 5,000 simulations. What does each observation in the sampling distribution represent? How does the mean, standard error, and shape of the sampling distribution change as the sample size increases? How (if at all) do these values change if you increase the number of simulations?
 </div>
     
 ```{r shiny, echo=FALSE, error=TRUE}
 ames_sampling_dist()
 ```
 
-5. It makes intuitive sense that as the sample size increases, the center of the sampling distribution becomes a more reliable estimate for the true population mean. Also as the sample size increases, the variability of the sampling distribution ________. 
-<ol>
-<li> decreases </li>
-<li> increases </li>
-<li> stays the same </li>
-</ol>
+<div class="question">
+ It makes intuitive sense that as the sample size increases, the center of the sampling distribution becomes a more reliable estimate for the true population mean. Also as the sample size increases, the variability of the sampling distribution ________. 
 
-<div id="exercise">
-**Exercise**: Take a random sample of size 50 from `price`. Using this sample, what is your best point estimate of the population mean?
+* decreases 
+* increases 
+* stays the same 
+</div>
+
+<div class="exercise">
+Take a random sample of size 50 from `price`. Using this sample, what is your best point estimate of the population mean?
 </div>
 ```{r price-sample}
 # type your code for this Exercise here, and Run Document
 
 ```
 
-<div id="exercise">
-**Exercise**: Since you have access to the population, simulate the sampling distribution for $\bar{x}_{price}$ by taking 5000 samples from the population of size 50 and computing 5000 sample means.  Store these means in a vector called `sample_means50`. Plot the data, then describe the shape of this sampling distribution. Based on this sampling distribution, what would you guess the mean home price of the population to be?
+<div class="exercise">
+Since you have access to the population, simulate the sampling distribution for $\bar{x}_{price}$ by taking 5000 samples from the population of size 50 and computing 5000 sample means.  Store these means in a vector called `sample_means50`. Plot the data, then describe the shape of this sampling distribution. Based on this sampling distribution, what would you guess the mean home price of the population to be?
 </div>
 ```{r price-sampling}
 # type your code for this Exercise here, and Run Document
 
 ```
 
-<div id="exercise">
-**Exercise**: Change your sample size from 50 to 150, then compute the sampling distribution using the same method as above, and store these means in a new vector called `sample_means150`. Describe the shape of this sampling distribution, and compare it to the sampling distribution for a sample size of 50.  Based on this sampling distribution, what would you guess to be the mean sale price of homes in Ames?
+<div class="exercise">
+Change your sample size from 50 to 150, then compute the sampling distribution using the same method as above, and store these means in a new vector called `sample_means150`. Describe the shape of this sampling distribution, and compare it to the sampling distribution for a sample size of 50.  Based on this sampling distribution, what would you guess to be the mean sale price of homes in Ames?
 </div>
 ```{r price-sampling-more}
 # type your code for this Exercise here, and Run Document
@@ -291,36 +295,37 @@ Note that while you might be able to answer some of these questions using the ap
 you are expected to write the required code and produce the necessary plots and
 summary statistics. You are welcomed to use the app for exploration.
 
-<div id="exercise">
-**Exercise**: Take a sample of size 15 from the population and calculate the mean `price` of the homes in this sample. Using this sample, what is your best point estimate of the population mean of prices of homes?
+<div class="exercise">
+Take a sample of size 15 from the population and calculate the mean `price` of the homes in this sample. Using this sample, what is your best point estimate of the population mean of prices of homes?
 </div>
 ```{r price-sample-small}
 # type your code for this Exercise here, and Run Document
 
 ```
 
-<div id="exercise">
-**Exercise**: Since you have access to the population, simulate the sampling distribution for $\bar{x}_{price}$ by taking 2000 samples from the population of size 15 and computing 2000 sample means. Store these means in a vector called `sample_means15`. Plot the data, then describe the shape of this sampling distribution. Based on this sampling distribution, what would you guess the mean home price of the population to be? Finally, calculate and report the population mean.
+<div class="exercise">
+Since you have access to the population, simulate the sampling distribution for $\bar{x}_{price}$ by taking 2000 samples from the population of size 15 and computing 2000 sample means. Store these means in a vector called `sample_means15`. Plot the data, then describe the shape of this sampling distribution. Based on this sampling distribution, what would you guess the mean home price of the population to be? Finally, calculate and report the population mean.
 </div>
 ```{r price-sampling-small}
 # type your code for this Exercise here, and Run Document
 
 ```
 
-<div id="exercise">
-**Exercise**: Change your sample size from 15 to 150, then compute the sampling distribution using the same method as above, and store these means in a new vector called `sample_means150`. Describe the shape of this sampling distribution, and compare it to the sampling distribution for a sample size of 15. Based on this sampling distribution, what would you guess to be the mean sale price of homes in Ames?
+<div class="exercise">
+Change your sample size from 15 to 150, then compute the sampling distribution using the same method as above, and store these means in a new vector called `sample_means150`. Describe the shape of this sampling distribution, and compare it to the sampling distribution for a sample size of 15. Based on this sampling distribution, what would you guess to be the mean sale price of homes in Ames?
 </div>
 ```{r price-sampling-big}
 # type your code for this Exercise here, and Run Document
 
 ```
 
-6. Which of the following is false? 
-<ol>
-<li> The variability of the sampling distribution with the smaller sample size (`sample_means50`) is smaller than the variability of the sampling distribution with the larger sample size (`sample_means150`). </li>
-<li> The means for the two sampling distribtuions are roughly similar. </li> 
-<li> Both sampling distributions are symmetric. </li>
-</ol>
+<div class="question">
+ Which of the following is false? 
+
+* The variability of the sampling distribution with the smaller sample size (`sample_means50`) is smaller than the variability of the sampling distribution with the larger sample size (`sample_means150`). 
+* The means for the two sampling distribtuions are roughly similar.  
+* Both sampling distributions are symmetric. 
+</div>
 ```{r price-sampling-compare}
 # type your code for Question 6 here, and Run Document
 

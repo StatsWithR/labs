@@ -3,10 +3,12 @@ title: "Foundations for inference - Confidence intervals"
 output: statsr:::statswithr_lab
 ---
 
-<div id="instructions">
+<div class="instructions">
 Complete all **Exercises**, and submit answers to **Questions** on the Coursera 
 platform.
 </div>
+
+## Introduction
 
 If you have access to data on an entire population, say the size of every 
 house in Ames, Iowa, it's straight forward to answer questions like, "How big 
@@ -17,8 +19,9 @@ typical size if you only know the sizes of several dozen houses? This sort of
 situation requires that you use your sample to make inference on what your 
 population looks like.
 
-<div id="boxedtext">
-**Setting a seed:** We will take some random samples and calculate confidence based
+### Setting a seed
+
+We will take some random samples and calculate confidence based
 on these samples in this lab, which means you should set a seed on top of your lab. If 
 this concept is new to you, review the previous lab and ask your TA.
 
@@ -78,8 +81,8 @@ n <- 60
 samp <- sample_n(ames, n)
 ```
 
-<div id="exercise">
-**Exercise**: Describe the distribution of homes in your sample. What would you 
+<div class="exercise">
+Describe the distribution of homes in your sample. What would you 
 say is the "typical" size within your sample? Also state precisely what you 
 interpreted "typical" to mean.
 </div>
@@ -88,11 +91,12 @@ interpreted "typical" to mean.
 
 ```
 
-1. True or False: My distribution should be similar to others' distributions who also collect random samples from this population, but it is likely not exactly the same since it's a random sample.
-<ol>
-<li> True. </li>
-<li> False. </li>
-</ol>
+<div class="question">
+ True or False: My distribution should be similar to others' distributions who also collect random samples from this population, but it is likely not exactly the same since it's a random sample.
+
+* True. 
+* False. 
+</div>
 
 ## Confidence intervals
 
@@ -135,23 +139,25 @@ To recap: even though we don't know what the full population looks like, we're 9
 confident that the true average size of houses in Ames lies between the values *lower* 
 and *upper*. There are a few conditions that must be met for this interval to be valid.
 
-2.  For the confidence interval to be valid, the sample mean must be normally distributed and have standard error $s / \sqrt{n}$. Which of the following is not a condition needed for this to be true?
-<ol>
-<li> The sample is random. </li>
-<li> The sample size, 60, is less than 10% of all houses. </li>
-<li> The sample distribution must be nearly normal. </li>
-</ol>
+<div class="question">
+  For the confidence interval to be valid, the sample mean must be normally distributed and have standard error $s / \sqrt{n}$. Which of the following is not a condition needed for this to be true?
+
+* The sample is random. 
+* The sample size, 60, is less than 10% of all houses. 
+* The sample distribution must be nearly normal. 
+</div>
 
 
 ## Confidence levels
 
-3.  What does "95% confidence" mean?
-<ol>
-<li> 95% of the time the true average area of houses in Ames, Iowa, will be in this interval. </li>
-<li> 95% of random samples of size 60 will yield confidence intervals that contain the true average area of houses in Ames, Iowa. </li>
-<li> 95% of the houses in Ames have an area in this interval. </li>
-<li> 95% confident that the sample mean is in this interval. </li>
-</ol>
+<div class="question">
+What does "95% confidence" mean?
+
+* 95% of the time the true average area of houses in Ames, Iowa, will be in this interval. 
+* 95% of random samples of size 60 will yield confidence intervals that contain the true average area of houses in Ames, Iowa. 
+* 95% of the houses in Ames have an area in this interval. 
+* 95% confident that the sample mean is in this interval. 
+</div>
 
 In this case we have the rare luxury of knowing the true population mean since we 
 have data on the entire population. Let's calculate this value so that
@@ -163,8 +169,8 @@ params <- ames %>%
   summarise(mu = mean(area))
 ```
 
-<div id="exercise">
-**Exercise**: Does your confidence interval capture the true average size of houses in 
+<div class="exercise">
+Does your confidence interval capture the true average size of houses in 
 Ames?
 </div>
 ```{r check-ci-contain-true-mean}
@@ -172,13 +178,14 @@ Ames?
 
 ```
 
-4. What proportion of 95% confidence intervals would you expect to capture the true population mean?
-<ol>
-<li> 1% </li>
-<li> 5% </li>
-<li> 95% </li>
-<li> 99% </li>
-</ol>
+<div class="question">
+What proportion of 95% confidence intervals would you expect to capture the true population mean?
+
+* 1% 
+* 5% 
+* 95% 
+* 99% 
+</div>
 
 Using R, we're going to collect many samples to learn more about how sample 
 means and confidence intervals vary from one sample to another.
@@ -265,38 +272,40 @@ ggplot(data = ci_data, aes(x = bound, y = replicate,
   geom_vline(xintercept = params$mu, color = "darkgray") # draw vertical line
 ```
 
-<div id="exercise">
-**Exercise**: What proportion of your confidence intervals include the true population mean? 
+<div class="exercise">
+What proportion of your confidence intervals include the true population mean? 
 Is this proportion exactly equal to the confidence level? If not, explain why.
 </div>
 
 
-5. What is the appropriate critical value for a 99% confidence level?
-<ol>
-<li> 0.01 </li>
-<li> 0.99 </li> 
-<li> 1.96 </li>
-<li> 2.33 </li>
-<li> 2.58 </li>
-</ol>
+<div class="question">
+  What is the appropriate critical value for a 99% confidence level?
+
+* 0.01 
+* 0.99  
+* 1.96 
+* 2.33 
+* 2.58 
+</div>
 ```{r find-99-perc-crit-val}
 # type your code for the Question 5 here, and Knit
 
 ```
 
-<div id="exercise">
-**Exercise**: Calculate 50 confidence intervals at the 99% confidence level. You do not need to obtain new samples, simply calculate new intervals based on the sample means and standard deviations you have already collected. Plot all intervals and calculate the proportion of intervals that include the true population mean.
+<div class="exercise">
+Calculate 50 confidence intervals at the 99% confidence level. You do not need to obtain new samples, simply calculate new intervals based on the sample means and standard deviations you have already collected. Plot all intervals and calculate the proportion of intervals that include the true population mean.
 </div>
 ```{r plot-99-perc-cis}
 # type your code for the Exercise here, and Knit
 
 ```
 
-6. We would expect 99% of the intervals to contain the true population mean.
-<ol>
-<li> True </li>
-<li> False </li>
-</ol>
+<div class="question">
+ We would expect 99% of the intervals to contain the true population mean.
+
+* True 
+* False 
+</div>
 
 
 <div id="license">
