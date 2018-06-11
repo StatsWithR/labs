@@ -80,6 +80,8 @@ library(tidyverse)
 library(statsr)
 library(BAS)
 library(broom)
+
+options(width=100)
 ```
 
 ### The data
@@ -234,7 +236,7 @@ of the regression line and obtain a 95% credible interval for the coefficients.
 What does the slope tell us in the context of the relationship between education
 and earnings?
 
-* Each additional year of education increases weekly wages by $60.21$.
+* Each additional year of education increases weekly wages by $60.21.
 * Each additional year of education increases weekly wages by $146.95.
 * For each additional year of education, there is a 95% chance that average weekly wages will possibly decrease by $5.56 or increase by $299.47.
 * For each additional year of education, there is a 95% chance that average weekly wages will increase by $49.04 to $71.39. 
@@ -305,7 +307,7 @@ have a normal distribution with mean zero and constant variance if the model
 holds.
 
 <div class="question">
-Which of the following statements about the residual plots are false?
+Which of the following statements about the residual plots are **false**?
 
 * The residuals appear to be randomly distributed around 0.
 * The residuals are strongly left skewed, hence the normal distribution of errors condition is not met.
@@ -391,7 +393,7 @@ outliers_df %>%
 ```
 
 <div class="question">
-Using the definition of outlier above, which statement is false?
+Using the definition of outlier above, which statement is **false**?
 
 * Case 434 has a probability of close to 1 that it an outlier under the normal error model for regressing `lwage` on `iq`
 * Case 514 has a probably of close to 1 that it an outlier under the normal error model for regressing `lwage` on `iq`
@@ -409,25 +411,21 @@ probability that there will be at least one error $\epsilon_i$ that exceeds $3$
 standard deviations above or below zero _a priori_. We can calculate this as 
 follows
 
+
 ```{r}
+# prob of a case being an outlier:
+#   being below or above 3 standard deviations from 0
+(prob_outlier <- pnorm(-3) + pnorm(3, lower.tail = FALSE))
+
+# probability of a signle case not being an outler is therefore the complement 
+(prob_not_outlier <- 1 - prob_outlier)
+
+# probability of no outliers in the sample of n assuming errors are independent a priori
 n <- nrow(wage)
+(prob_no_outliers <- prob_not_outlier^n)
 
-# prob of a case being an outlier:  
-# being below or above 3 standard deviations
-# from 0
-prob_outlier <- pnorm(-3) + pnorm(3, lower.tail = F)
-
-# probability of a signle case not being an outler is 
-# the complement
-prob_not_outlier <- 1 - prob_outlier
-
+# probability of at least one outlier in the sample is the complement of the 
 # probability of no outliers in the sample of n
-# assuming errors are independent a priori
-prob_no_outliers <- prob_not_outlier^n
-
-# probability of at least one outlier in the sample
-# is the complement of the probability of no outliers
-# in the sample of n
 1 - prob_no_outliers
 ```
 
@@ -446,8 +444,9 @@ $$ P(\text{observation is not an outlier}) = 0.95^{1/n} $$
 and then solve for  $k$ using the normal quantile function.
 
 ```{r}
-prob_obs_not_outlier <- 0.95^(1/n)
-newk <- qnorm(0.5 + 0.5 * prob_obs_not_outlier)
+n <- nrow(wage)
+(prob_obs_not_outlier <- 0.95^(1/n))
+(newk <- qnorm(0.5 + 0.5 * prob_obs_not_outlier))
 ```
 
 The function `Bayes.outlier` can also calculate `k` internally if we specify 
@@ -458,10 +457,9 @@ outliers <- Bayes.outlier(m_lwage_iq, prior.prob=0.95)
 ```
 
 <div class="question">
-Use the new value of $k$ to calculate the posterior probability of being an 
+Use the new value of $k$ to calculate the posterior probability of each observation being an 
 outlier. Which observation has a posterior probability of being an outlier 
-that exceeds the prior probability of being an outlier of 
-`r round(1 - prob_obs_not_outlier, 4)`?
+that exceeds the prior probability of being an outlier?
 
 * Case 434
 * Case 514
@@ -534,7 +532,7 @@ the same, the data set can be specified as `na.omit(wage)`, which includes only
 the observations with no missing values in any variables in the data set.
 
 ```{r}
-m_lwage_nobrthord <- lm(lwage ~ . -wage -brthord, data = na.omit(wage))
+m_lwage_nobrthord <- lm(lwage ~ . - wage - brthord, data = na.omit(wage))
 BIC(m_lwage_nobrthord)
 ```
 
@@ -589,7 +587,7 @@ bma_lwage <- bas.lm(lwage ~ . -wage, data = wage_no_na,
                    prior = "BIC", 
                    modelprior = uniform())
 
-# Print out the marginal posterior inclusion probabilities for each variable   
+# Print out the marginal posterior inclusion probabilities for each variable                
 bma_lwage
 
 # Top 5 most probably models
@@ -655,7 +653,7 @@ the following variables has the lowest marginal posterior inclusion probability?
 ```
 
 <div class="question">
-True or False: The naive model with all variables included has posterior 
+**True** or **False**: The naive model with all variables included has posterior 
 probability greater than 0.5.
 
 * True
@@ -751,7 +749,7 @@ This can be used to identify the variables in the  *Highest Probability Model* (
 
 ```{r HPM}
 HPM_pred_lwage <- predict(bma_lwage, estimator = "HPM")
-variable.names(HPM_pred_lwage$bestmodel)
+variable.names(HPM_pred_lwage)
 ```
 
 and the 
@@ -759,7 +757,7 @@ and the
 
 ```{r MPM}
 MPM_pred_lwage <- predict(bma_lwage, estimator = "MPM")
-variable.names(MPM_pred_lwage$bestmodel)
+variable.names(MPM_pred_lwage)
 ```
 
 The `MPM` includes `exper` in addition to all of the variables in the 
@@ -812,7 +810,7 @@ exp(ci_lwage[opt,])
 If we were to use BMA, the interval would be 
 
 ```{r}
-BMA_pred_lwage <- predict(bma_lwage, estimator = "BMA", se.fit = TRUE)
+BMA_pred_lwage <- predict(bma_lwage_red, estimator = "BMA", se.fit = TRUE)
 ci_bma_lwage <- confint(BMA_pred_lwage, estimator = "BMA")
 opt_bma <- which.max(BMA_pred_lwage$fit)
 exp(ci_bma_lwage[opt_bma, ])
