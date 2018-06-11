@@ -37,7 +37,7 @@ references:
   ISBN: 9780521686891
 ---
 
-<div id="instructions">
+<div class="instructions">
 Complete all **Exercises**, and submit answers to **Questions** on the Coursera 
 platform.
 </div>
@@ -118,35 +118,38 @@ variable         | description
 `pic_outfit`     | outfit of professor in picture: not formal, formal.
 `pic_color`      | color of professor's picture: color, black & white.
 
-1. Is this an observational study or an experiment?
-<ol>
-<li> Observational study </li>
-<li> Experiment </li>
-</ol>
+<div class="question">
+ Is this an observational study or an experiment?
 
-2. The original research question posed in the paper is whether beauty leads directly to the differences in course evaluations.  Given the study design, should the question be rephrased? If so, how? 
-<ol>
-<li> No, the question is worded accurately. </li>
-<li> Yes, revise wording to "Is there an association between beauty and course evaluations?" </li>
-<li> Yes, revise wording to "Does beauty score increase the professor's course evaluations?"  </li>
-<li> Yes, revise wording to "Does beauty score decrease the professor's course evaluations?" </li>
-</ol>
+* Observational study 
+* Experiment 
+</div>
+
+<div class="question">
+ The original research question posed in the paper is whether beauty leads directly to the differences in course evaluations.  Given the study design, should the question be rephrased? If so, how? 
+
+* No, the question is worded accurately. 
+* Yes, revise wording to "Is there an association between beauty and course evaluations?" 
+* Yes, revise wording to "Does beauty score increase the professor's course evaluations?"  
+* Yes, revise wording to "Does beauty score decrease the professor's course evaluations?" 
+</div>
 
 ## Exploring the data
 
-3. Which of the following statements is **false** about the distribution of `score`? 
-<ol>
-<li> The median of the distribution is 4.3. </li>
-<li> 25\% of the students gave their professors a score of over 4.6. </li> 
-<li> 11 of students gave a professor a score below 3. </li> 
-<li> The left skewness of the data suggests that the students are less likely to rate the professors highly. </li>
-</ol>
+<div class="question">
+ Which of the following statements is **false** about the distribution of `score`? 
+
+* The median of the distribution is 4.3. 
+* 25\% of the students gave their professors a score of over 4.6.  
+* 11 of students gave a professor a score below 3.  
+* The left skewness of the data suggests that the students are less likely to rate the professors highly. 
+</div>
 ```{r score-dist}
 # type your code for Question 3 here, and Knit
 
 ```
 
-<div id="exercise">
+<div class="exercise">
 **Exercise:** Excluding `score`, select two other variables and describe their 
 relationship using an appropriate visualization (scatterplot, side-by-side boxplots, 
 or mosaic plot).
@@ -171,7 +174,7 @@ Before we draw conclusions about the trend, compare the number of observations
 in the data frame with the approximate number of points on the scatterplot. 
 Is anything awry?
 
-<div id="exercise">
+<div class="exercise">
 **Exercise:** Replot the scatterplot, but this time replace the `geom_point()` layer 
 with a `geom_jitter()` layer. (Use `?geom_jitter` to learn more.)  What was misleading 
 about the initial scatterplot?
@@ -201,28 +204,32 @@ ggplot(data = evals, aes(x = bty_avg, y = score)) +
   geom_smooth(method = "lm", se = FALSE)
 ```
 
-<div id="exercise">
+<div class="exercise">
 **Exercise:** Print a summary of the linear model, write out the equation, and 
 interpret the slope. 
 </div>
+
 ```{r summary-model}
 # type your code for the Exercise here, and Knit
 
 ```
 
-4. Average beauty score is a statistically significant predictor of evaluation score. 
-<ol> 
-<li> True </li>
-<li> False </li>
-</ol>
+<div class="question">
+ Average beauty score is a statistically significant predictor of evaluation score. 
+ 
+* True 
+* False 
+</div>
 
-5. Use residual plots to evaluate whether the conditions of least squares regression are reasonable.  Which of the following statements is an incorrect analysis of the residual plots and conditions? 
-<ol>
-<li> Linear association: The residuals plot shows a random scatter. </li>
-<li> Constant variance of residuals: No fan shape in residuals plot. </li>
-<li> Nearly normal residuals: Residuals are right skewed, but the sample size is large, so this may not be an important violation of conditions. </li>
-<li> Independent observations: Classes sampled randomly, no order effect. </li>
-</ol>
+<div class="question">
+ Use residual plots to evaluate whether the conditions of least squares regression are reasonable.  Which of the following statements is an incorrect analysis of the residual plots and conditions? 
+
+* Linear association: The residuals plot shows a random scatter. 
+* Constant variance of residuals: No fan shape in residuals plot. 
+* Nearly normal residuals: Residuals are right skewed, but the sample size is large, so this may not be an important violation of conditions. 
+* Independent observations: Classes sampled randomly, no order effect. 
+</div>
+
 ```{r diag-score-bty_avg}
 # type your code for the Question 5 here, and Knit
 
@@ -266,22 +273,24 @@ m_bty_gen <- lm(score ~ bty_avg + gender, data = evals)
 summary(m_bty_gen)
 ```
 
-6. P-values and parameter estimates should only be trusted if the conditions for the regression are reasonable. Using diagnostic plots, we can conclude that the conditions for this model are reasonable. 
-<ol>
-<li> True </li>
-<li> False </li>
-</ol>
+<div class="question">
+ P-values and parameter estimates should only be trusted if the conditions for the regression are reasonable. Using diagnostic plots, we can conclude that the conditions for this model are reasonable. 
+
+* True 
+* False 
+</div>
 </div>
 ```{r diag-mlr-model}
 # type your code for the Exercise here, and Knit
 
 ```
 
-<div id="exercise">
+<div class="exercise">
 **Exercise:** Print a summary of the multiple linear regression model.  Is `bty_avg` 
 still a significant predictor of `score`?  Has the addition of `gender` to the 
 model changed the parameter estimate for `bty_avg`?
 </div>
+
 ```{r summary-mlr-model}
 # type your code for the Exercise here, and Knit
 
@@ -297,17 +306,20 @@ variables.)
 As a result, for females, the parameter estimate is multiplied by zero, leaving 
 the intercept and slope form familiar from simple regression.
 
-\[
-  \begin{aligned}
-\widehat{score} &= \hat{\beta}_0 + \hat{\beta}_1 \times bty\_avg + \hat{\beta}_2 \times (0) \\
-&= \hat{\beta}_0 + \hat{\beta}_1 \times bty\_avg\end{aligned}
-\]
+$$
+\begin{aligned}
+  \widehat{score} 
+    &= \hat{\beta}_0 + \hat{\beta}_1 \times bty\_avg + \hat{\beta}_2 \times (0) \\
+    &= \hat{\beta}_0 + \hat{\beta}_1 \times bty\_avg
+\end{aligned}
+$$
 
-7. For two professors (one male and one female) who received the same beauty rating, the male professor is predicted to have the higher course evaluation score than the female.
-<ol>
-<li> True </li>
-<li> False </li>
-</ol>
+<div class="question">
+ For two professors (one male and one female) who received the same beauty rating, the male professor is predicted to have the higher course evaluation score than the female.
+
+* True 
+* False 
+</div>
 
 The decision to call the indicator variable `gendermale` instead of`genderfemale`
 has no deeper meaning. R simply codes the category that comes first 
@@ -315,24 +327,26 @@ alphabetically as a $0$. (You can change the reference level of a categorical
 variable, which is the level that is coded as a 0, using the`relevel` function. 
 Use `?relevel` to learn more.)
 
-<div id="exercise">
+<div class="exercise">
 **Exercise:** Create a new model called `m_bty_rank` with `gender` removed and 
 `rank` added in.  How does R appear to handle categorical variables that have 
 more than two levels? Note that the rank variable has three levels: teaching, 
 tenure track, tenured.
 </div>
+
 ```{r new-mlr-model}
 # type your code for the Exercise here, and Knit
 
 ```
 
-8. Which of the following is the correct order of the three levels of rank if we were to order them from lowest predicted course evaluation score to highest predicted course evaluation score? 
-<ol>
-<li> Teaching, Tenure Track, Tenured </li>
-<li> Tenure track, Tenured </li>
-<li> Tenure Track, Tenured, Teaching </li>
-<li> Teaching, Tenured, Tenure Track </li>
-</ol>
+<div class="question">
+ Which of the following is the correct order of the three levels of rank if we were to order them from lowest predicted course evaluation score to highest predicted course evaluation score? 
+
+* Teaching, Tenure Track, Tenured 
+* Tenure track, Tenured 
+* Tenure Track, Tenured, Teaching 
+* Teaching, Tenured, Tenure Track 
+</div>
 
 The interpretation of the coefficients in multiple regression is slightly 
 different from that of simple regression. The estimate for `bty_avg` reflects
@@ -403,15 +417,16 @@ summary(m_full)
 output in your response.
 </div>
 
-9. Which of the following is the correct intrepetation of the coefficient associated with the ethnicity variable. <br> Non-minority professors are expected on average to score ... 
-<ol>
-<li> 0.12 points lower than minority professors, all else held constant. </li>
-<li> 0.12 points higher than minority professors, all else held constant. </li> 
-<li> 0.02 points lower than minority professors, all else held constant. </li>
-<li> 0.02 points higher than minority professors, all else held constant. </li>
-</ol>
+<div class="question">
+ Which of the following is the correct intrepetation of the coefficient associated with the ethnicity variable. <br> Non-minority professors are expected on average to score ... 
 
-<div id="exercise">
+* 0.12 points lower than minority professors, all else held constant. 
+* 0.12 points higher than minority professors, all else held constant.  
+* 0.02 points lower than minority professors, all else held constant. 
+* 0.02 points higher than minority professors, all else held constant. 
+</div>
+
+<div class="exercise">
 **Exercise:** Drop the variable with the highest p-value and re-fit the model. 
 Did the coefficients and significance of the other explanatory variables change? 
 (One of the things that makes multiple regression interesting is that coefficient 
@@ -442,41 +457,43 @@ m2 = lm(score ~ rank + gender + language + age + cls_perc_eval +
 summary(m2)$adj.r.squared
 ```
 
-<div id="exercise">
+<div class="exercise">
 **Exercise:** Repeat this process until you have tried removing each variable 
 from the full model at a time, and determine removal of which variable yields 
 the highest improvement in the adjusted $R^2$.
 </div>
+
 ```{r adj-rsq-select}
 # type your code for the Exercise here, and Knit
 
 ```
 
-10. Elimination of which variable from the full model yielded the highest adjusted R-squared? 
-<ol>
-<li> `bty_avg` </li>
-<li> `cls_profs` </li> 
-<li> `cls_students` </li>
-<li> `rank` </li>
-</ol>
+<div class="question">
+ Elimination of which variable from the full model yielded the highest adjusted R-squared? 
+
+* `bty_avg` 
+* `cls_profs`  
+* `cls_students` 
+* `rank` 
+</div>
 
 To complete the model selection we would continue removing variables one at a 
 time until removal of another variable did not increase adjusted $R^2$.
 
-<div id="exercise">
+<div class="exercise">
 **Exercise:** The original paper describes how these data were gathered by taking 
 a sample of professors from the University of Texas at Austin and including all 
 courses that they have taught.  Considering that each row represents a course, 
 could this new information have an impact on any of the conditions of linear regression?
 </div>
 
-<div id="exercise">
+<div class="exercise">
 **Exercise:** Based on your final model, describe the characteristics of a 
 professor and course at University of Texas at Austin that would be associated 
 with a high evaluation score.
 </div>
 
-<div id="exercise">
+<div class="exercise">
 **Exercise:** Would you be comfortable generalizing your conclusions to apply 
 to professors generally (at any university)?  Why or why not?
 </div>
