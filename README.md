@@ -17,8 +17,8 @@ This repository contains the most recent versions of all R Markdown based labs f
 
 ### 3. Linear Regression and Modeling
 
-- Lab 1 - [Simple Regression](3.1_simple_regression/simple_regression_Coursera.Rmd)
-- Lab 2 - [Multiple Regression](3.2_multiple_regression/multiple_regression_Coursera.Rmd)
+- Lab 1 - [Simple Linear Regression](3.1_simple_regression/simple_regression_Coursera.Rmd)
+- Lab 2 - [Multiple Linear Regression](3.2_multiple_regression/multiple_regression_Coursera.Rmd)
 
 ### 4. Bayesian Statistics
 
