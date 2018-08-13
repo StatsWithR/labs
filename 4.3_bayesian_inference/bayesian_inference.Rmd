@@ -177,7 +177,7 @@ The second argument, `data`, specifies the dataset `nc_fullterm` that contains
 the variable `weight`. The third argument `statistic` is the sample statistic 
 we're using, or similarly, the population parameter we're estimating. The 
 argument `type` specifies the type of inference that we want: credible 
-intervals (`type="ci"`), or hypothesis tests (`type="ht"`). The argument `prior` 
+intervals (`type = "ci"`), or hypothesis tests (`type = "ht"`). The argument `prior` 
 indicates which prior distribution for any unknown parameters we will use for inference or testing, with options `JZS` (the Jeffreys-Zellner-Siow prior which 
 is the Jeffreys prior for the unknown variance and a Cauchy prior for the mean), 
 `JUI` (the Jeffreys-Unit Information prior which is the Jeffreys prior for the 
@@ -220,7 +220,7 @@ $$ H_1: \mu = 7.7 $$
 $$ H_2: \mu \ne 7.7 $$
 
 To conduct this hypothesis test, we will need to change the `type` argument to 
-hypothesis test, `type="ht"` in the `bayes_inference` function. In addition, we 
+hypothesis test, `type = "ht"` in the `bayes_inference` function. In addition, we 
 will need to add the type of alternative hypothesis as an additional argument 
 `alternative = "twosided"`. For faster calculation, change the method to 
 `theoretical` and add `show_plot=FALSE`.
