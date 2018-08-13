@@ -25,4 +25,4 @@ This repository contains the most recent versions of all R Markdown based labs f
 - Lab 1 - [Two Armed Bandit](4.1_two_armed_bandit/two_armed_bandit.Rmd)
 - Lab 2 - [Conjugate Priors](4.2_conjugate_priors/credible_interval.Rmd)
 - Lab 3 - [Bayesian Inference](4.3_bayesian_inference/bayesian_inference.Rmd)
-- Lab 4 - [Bayesian Linear Regression](4.4_bayes_regression/bayes_regression.Rmd)  ([Supplement](4.4_bayes_regression/bayes_regression_supplement.Rmd))
+- Lab 4 - [Bayesian Linear Regression](4.4_bayes_regression/bayes_regression.Rmd)
