@@ -281,7 +281,7 @@ statistics.
 
 <div class="question">
   Calculate the median and interquartile range for `arr_delay`s of flights in the 
-`sfo_feb_flights` data frame, grouped by carrier. Which carrier is the has the hights 
+`sfo_feb_flights` data frame, grouped by carrier. Which carrier has the highest 
 IQR of arrival delays? 
 
 * American Airlines  
